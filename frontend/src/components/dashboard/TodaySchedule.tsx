@@ -2,6 +2,9 @@ import { Clock, MapPin, Coffee, Utensils } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import api from "@/api/axios";
+import { useEffect, useState } from "react";
+
 
 interface ScheduleItem {
   time: string;
@@ -15,88 +18,58 @@ interface ScheduleItem {
   endMinute: number;
 }
 
-const schedule: ScheduleItem[] = [
-  {
-    time: "10:00 - 11:00",
-    subject: "Data Structures & Algorithms",
-    faculty: "Dr. Rajesh Kumar",
-    room: "Room 301",
-    type: "Lecture",
-    startHour: 10, startMinute: 0, endHour: 11, endMinute: 0,
-  },
-  {
-    time: "11:00 - 12:00",
-    subject: "Database Management Systems",
-    faculty: "Prof. Anita Sharma",
-    room: "Room 205",
-    type: "Lecture",
-    startHour: 11, startMinute: 0, endHour: 12, endMinute: 0,
-  },
-  {
-    time: "12:00 - 12:45",
-    subject: "Lunch Break",
-    faculty: "",
-    room: "",
-    type: "Break",
-    startHour: 12, startMinute: 0, endHour: 12, endMinute: 45,
-  },
-  {
-    time: "12:45 - 13:45",
-    subject: "Web Technologies Lab",
-    faculty: "Mr. Vikram Singh",
-    room: "Lab 102",
-    type: "Practical",
-    startHour: 12, startMinute: 45, endHour: 13, endMinute: 45,
-  },
-  {
-    time: "13:45 - 14:45",
-    subject: "Computer Networks",
-    faculty: "Dr. Priya Menon",
-    room: "Room 401",
-    type: "Lecture",
-    startHour: 13, startMinute: 45, endHour: 14, endMinute: 45,
-  },
-  {
-    time: "14:45 - 15:00",
-    subject: "Short Break",
-    faculty: "",
-    room: "",
-    type: "Break",
-    startHour: 14, startMinute: 45, endHour: 15, endMinute: 0,
-  },
-  {
-    time: "15:00 - 16:00",
-    subject: "Operating Systems",
-    faculty: "Dr. Sunil Mehta",
-    room: "Room 303",
-    type: "Lecture",
-    startHour: 15, startMinute: 0, endHour: 16, endMinute: 0,
-  },
-  {
-    time: "16:00 - 17:00",
-    subject: "Software Engineering",
-    faculty: "Prof. Kavita Joshi",
-    room: "Room 202",
-    type: "Lecture",
-    startHour: 16, startMinute: 0, endHour: 17, endMinute: 0,
-  },
-];
-
-function getItemStatus(item: ScheduleItem): "past" | "ongoing" | "upcoming" {
-  const now = new Date();
-  const currentHour = now.getHours();
-  const currentMinute = now.getMinutes();
-  const currentTime = currentHour * 60 + currentMinute;
-  
-  const startTime = item.startHour * 60 + item.startMinute;
-  const endTime = item.endHour * 60 + item.endMinute;
-  
-  if (currentTime >= endTime) return "past";
-  if (currentTime >= startTime && currentTime < endTime) return "ongoing";
-  return "upcoming";
-}
-
 export function TodaySchedule() {
+  const [schedule, setSchedule] = useState<ScheduleItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // ✅ ADDED: Fetch schedule from backend
+  useEffect(() => {
+    api.get("/home/today-schedule/")
+      .then((res) => {
+        const formatted = res.data.map((item: any) => {
+
+          // Convert "HH:MM:SS" to numbers
+          const [startHour, startMinute] = item.start_time.split(":").map(Number);
+          const [endHour, endMinute] = item.end_time.split(":").map(Number);
+
+          return {
+            time: `${item.start_time.slice(0,5)} - ${item.end_time.slice(0,5)}`,
+            subject: item.subject,
+            faculty: item.faculty,
+            room: item.room,
+            type: item.type,
+            startHour,
+            startMinute,
+            endHour,
+            endMinute,
+          };
+        });
+
+        setSchedule(formatted);
+      })
+      .catch((err) => {
+        console.error("Failed to load today's schedule", err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
+  // 🔹 Status logic unchanged
+  function getItemStatus(item: ScheduleItem): "past" | "ongoing" | "upcoming" {
+    const now = new Date();
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+    const currentTime = currentHour * 60 + currentMinute;
+
+    const startTime = item.startHour * 60 + item.startMinute;
+    const endTime = item.endHour * 60 + item.endMinute;
+
+    if (currentTime >= endTime) return "past";
+    if (currentTime >= startTime && currentTime < endTime) return "ongoing";
+    return "upcoming";
+  }
+
   const today = new Date();
   const dayName = today.toLocaleDateString('en-US', { weekday: 'long' });
   const dateStr = today.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -110,6 +83,28 @@ export function TodaySchedule() {
         </span>
       </div>
 
+            {/* ✅ Skeleton Loading Preserved */}
+      {loading && (
+        <div className="space-y-2">
+          <div className="h-16 bg-muted rounded-lg animate-pulse"></div>
+          <div className="h-16 bg-muted rounded-lg animate-pulse"></div>
+          <div className="h-16 bg-muted rounded-lg animate-pulse"></div>
+        </div>
+      )}
+
+      {!loading && schedule.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-10 text-center">
+          <Coffee className="w-8 h-8 text-muted-foreground mb-3" />
+          <p className="text-sm text-muted-foreground font-medium">
+            Enjoy your day 🎉
+          </p>
+          <p className="text-xs text-muted-foreground/70 mt-1">
+            No lectures scheduled for today.
+          </p>
+        </div>
+      )}
+
+      {!loading && schedule.length > 0 && (
       <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1">
         {schedule.map((item, index) => {
           const status = getItemStatus(item);
@@ -126,7 +121,7 @@ export function TodaySchedule() {
                   isPast && "opacity-40"
                 )}
               >
-                {item.subject.includes("Lunch") ? (
+                {item.subject?.includes("Lunch") ? (
                   <Utensils className="w-4 h-4 text-amber-500" />
                 ) : (
                   <Coffee className="w-4 h-4 text-amber-500" />
@@ -192,7 +187,7 @@ export function TodaySchedule() {
           );
         })}
       </div>
-
+      )}
       <Link 
         to="/timetable" 
         className="block w-full mt-4 py-2 text-sm text-center text-primary hover:bg-primary/5 rounded-lg transition-colors"

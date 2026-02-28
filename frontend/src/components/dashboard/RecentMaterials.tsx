@@ -1,6 +1,9 @@
 import { BookOpen, FileText, ExternalLink, Calendar, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import api from "@/api/axios";
+
 
 interface RecentMaterial {
   id: string;
@@ -13,60 +16,55 @@ interface RecentMaterial {
   hasReferenceLink: boolean;
 }
 
-const recentMaterials: RecentMaterial[] = [
-  {
-    id: "1",
-    title: "Unit 2 - Trees and Graphs",
-    subjectName: "Data Structures",
-    subjectCode: "CS301",
-    uploadedBy: "Dr. Rajesh Kumar",
-    uploadedAt: "2 hours ago",
-    filesCount: 2,
-    hasReferenceLink: true,
-  },
-  {
-    id: "2",
-    title: "Process Scheduling Algorithms",
-    subjectName: "Operating Systems",
-    subjectCode: "CS302",
-    uploadedBy: "Prof. Anita Sharma",
-    uploadedAt: "5 hours ago",
-    filesCount: 1,
-    hasReferenceLink: false,
-  },
-  {
-    id: "3",
-    title: "SQL Joins and Subqueries",
-    subjectName: "Database Management",
-    subjectCode: "CS303",
-    uploadedBy: "Dr. Priya Menon",
-    uploadedAt: "1 day ago",
-    filesCount: 3,
-    hasReferenceLink: true,
-  },
-  {
-    id: "4",
-    title: "OSI Model Complete Notes",
-    subjectName: "Computer Networks",
-    subjectCode: "CS304",
-    uploadedBy: "Prof. Vikram Singh",
-    uploadedAt: "2 days ago",
-    filesCount: 1,
-    hasReferenceLink: false,
-  },
-];
-
 export function RecentMaterials() {
+  const [recentMaterials, setRecentMaterials] = useState<RecentMaterial[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // ✅ ADDED: Fetch from backend
+  useEffect(() => {
+    api.get("/home/recent-materials/")
+      .then((res) => {
+
+        const formatted = res.data.map((item: any) => {
+          const uploadedDate = new Date(item.uploadedAt);
+          const now = new Date();
+          const diffMs = now.getTime() - uploadedDate.getTime();
+          const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+
+          let uploadedAtText = "";
+
+          if (diffHours < 1) {
+            uploadedAtText = "Just now";
+          } else if (diffHours < 24) {
+            uploadedAtText = `${diffHours} hour${diffHours > 1 ? "s" : ""} ago`;
+          } else {
+            const diffDays = Math.floor(diffHours / 24);
+            uploadedAtText = `${diffDays} day${diffDays > 1 ? "s" : ""} ago`;
+          }
+
+          return {
+            ...item,
+            uploadedAt: uploadedAtText,
+          };
+        });
+
+        setRecentMaterials(formatted);
+      })
+      .catch((err) => {
+        console.error("Failed to load recent materials", err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
   return (
     <div className="stat-card animate-slide-up" style={{ animationDelay: "0.5s" }}>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <BookOpen className="h-5 w-5 text-primary" />
-          <h3 className="text-lg font-semibold text-foreground">Recent Assignments & Notes</h3>
+          <h3 className="text-lg font-semibold text-foreground">Recent Notes & Updates</h3>
         </div>
-        <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded-full">
-          {recentMaterials.length} New
-        </span>
       </div>
 
       <div className="space-y-3 max-h-80 overflow-y-auto custom-scrollbar pr-1">
@@ -121,7 +119,7 @@ export function RecentMaterials() {
       </div>
 
       <Link 
-        to="/materials"
+        to="/noticeboard"
         className="block w-full mt-4 py-2 text-sm text-center text-primary hover:bg-primary/5 rounded-lg transition-colors"
       >
         View All Materials →

@@ -5,8 +5,14 @@ import { QuickAccess } from "@/components/dashboard/QuickAccess";
 import { TodaySchedule } from "@/components/dashboard/TodaySchedule";
 import { RecentMaterials } from "@/components/dashboard/RecentMaterials";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useStudentDashboard } from "@/hooks/useStudentDashboard";
+
 
 const StudentDashboard = () => {
+  const { data, loading } = useStudentDashboard();
+
+  
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -24,10 +30,10 @@ const StudentDashboard = () => {
         </div>
 
         {/* Profile Card */}
-        <ProfileCard />
+        <ProfileCard profile={data?.profile} loading={loading} />
 
         {/* Stats Grid */}
-        <StatCards />
+        <StatCards stats={data?.stats} loading={loading} />
 
         {/* Quick Access Resources */}
         <QuickAccess />
