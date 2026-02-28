@@ -17,12 +17,15 @@ urlpatterns = [
 
     #authentication
     path("api/auth/", include("home.urls")),
+
+    #Attendance
+    path("api/attendance/", include("attendance.urls")),
     
     #profiles
     path("api/", include("profiles.urls")),
 
-    #statcard
-    path("api/attendance/", include("attendance.urls")),
+    #home   
+    path("api/home/", include("home.urls")),
 
     #result analysis
     path("api/result-analysis/", include("resultanalysis.urls")),
@@ -30,16 +33,13 @@ urlpatterns = [
     #results
     path("api/results/", include("results.urls")),
 
-
     #timetables
     path("api/", include("timetables.urls")),
-
 
     #chatbot
     path("api/chatbot/", include("chatbot.urls")),
 
-
-    # ✅ ADDED noticeboard routes
+    #noticeboard
     path('api/', include('noticeboard.urls')),
 
 

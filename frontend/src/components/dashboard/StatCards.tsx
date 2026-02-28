@@ -1,55 +1,79 @@
-import { 
-  CalendarCheck, 
-  BookOpen, 
-  TrendingUp, 
-  ClipboardList
+import {
+  CalendarCheck,
+  BookOpen,
+  TrendingUp,
+  Trophy
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ProgressRing } from "@/components/dashboard/ProgressRing";
 import { cn } from "@/lib/utils";
 
-const stats = [
-  {
-    label: "Overall Attendance",
-    value: 82,
-    type: "progress",
-    icon: CalendarCheck,
-    color: "text-success",
-    bgColor: "bg-success/10",
-    href: "/attendance",
-  },
-  {
-    label: "Subjects Enrolled",
-    value: "4",
-    subtitle: "This Semester",
-    icon: BookOpen,
-    color: "text-primary",
-    bgColor: "bg-primary/10",
-    href: null,
-  },
-  {
-    label: "Current CGPA",
-    value: "6.50",
-    subtitle: "Previous: 5.50",
-    icon: TrendingUp,
-    color: "text-success",
-    bgColor: "bg-success/10",
-    trend: "+1.00",
-    href: "/results",
-  },
-  {
-    label: "Pending Assignments",
-    value: "3",
-    subtitle: "Due this week",
-    icon: ClipboardList,
-    color: "text-warning",
-    bgColor: "bg-warning/10",
-    href: "/materials",
-  },
-];
 
-export function StatCards() {
+
+interface StatsProps {
+  stats?: {
+    attendance_percentage: number;
+    subjects_enrolled: number;
+    current_sgpa: number;
+    rank: number;
+  };
+  loading: boolean;
+}
+
+export function StatCards({ stats, loading }: StatsProps) {
   const navigate = useNavigate();
+  if (loading || !stats) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="stat-card animate-pulse h-32" />
+        <div className="stat-card animate-pulse h-32" />
+        <div className="stat-card animate-pulse h-32" />
+        <div className="stat-card animate-pulse h-32" />
+      </div>
+    );
+  }
+
+
+
+  const statData = [
+    {
+      label: "Overall Attendance",
+      value: stats.attendance_percentage,
+      subtitle: "Across All Subjects",
+      type: "progress",
+      icon: CalendarCheck,
+      color: "text-success",
+      bgColor: "bg-success/10",
+      href: "/attendance",
+    },
+    {
+      label: "Subjects Enrolled",
+      value: stats.subjects_enrolled,
+      subtitle: "This Semester",
+      icon: BookOpen,
+      color: "text-primary",
+      bgColor: "bg-primary/10",
+      href: "/results",
+    },
+    {
+      label: "SGPA",
+      value: stats.current_sgpa,
+      subtitle: "Previous Semester",
+      icon: TrendingUp,
+      color: "text-success",
+      bgColor: "bg-success/10",
+      href: "/results",
+    },
+    {
+      label: "Your Rank",
+      value: stats.rank,
+      subtitle: "From Your Batch",
+      icon: Trophy,
+      color: "text-warning",
+      bgColor: "bg-warning/10",
+      href: "/results",
+    },
+  ];
 
   const handleClick = (href: string | null) => {
     if (href) {
@@ -57,9 +81,10 @@ export function StatCards() {
     }
   };
 
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      {stats.map((stat, index) => (
+      {statData.map((stat, index) => (
         <div
           key={stat.label}
           className={cn(
@@ -82,11 +107,6 @@ export function StatCards() {
                 <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center", stat.bgColor)}>
                   <stat.icon className={cn("w-5 h-5", stat.color)} />
                 </div>
-                {stat.trend && (
-                  <span className="text-xs font-medium text-success bg-success/10 px-2 py-0.5 rounded-full">
-                    {stat.trend}
-                  </span>
-                )}
               </div>
               <p className="mt-3 text-2xl font-bold text-foreground">{stat.value}</p>
               <p className="text-sm text-muted-foreground">{stat.label}</p>
