@@ -14,7 +14,7 @@ export function ChatInterface({ variant = "dashboard" }: ChatInterfaceProps) {
      ✅ Detect Staff from JWT
   ---------------------------- */
   const isStaff = useMemo(() => {
-    const token = localStorage.getItem("access");
+    const token = localStorage.getItem("access_token");
     if (!token) return false;
 
     try {
@@ -54,7 +54,7 @@ export function ChatInterface({ variant = "dashboard" }: ChatInterfaceProps) {
         ...baseSubjects,
         {
           id: "add-updates",
-          name: "Add Updates",
+          name: "Post Updates",
           code: "STAFF",
           chunksAvailable: false,
         },
@@ -113,21 +113,21 @@ export function ChatInterface({ variant = "dashboard" }: ChatInterfaceProps) {
     setMessages((prev) => [...prev, loadingMessage]);
 
     try {
-      const token = localStorage.getItem("access");
+      const token = localStorage.getItem("access_token");
 
       /* -----------------------------------------
          ✅ STAFF ADD UPDATES MODE
       ------------------------------------------ */
       if (selectedSubject.id === "add-updates") {
         const response = await fetch(
-          "http://127.0.0.1:8000/api/chatbot/staff/add-update/",
+          "http://127.0.0.1:8000/api/chatbot/post-update/",
           {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
-            body: JSON.stringify({ message: content }),
+            body: JSON.stringify({ content: content, }),
           }
         );
 
@@ -167,7 +167,7 @@ export function ChatInterface({ variant = "dashboard" }: ChatInterfaceProps) {
               selectedSubject.id === "dbms"
                 ? "DBMS"
                 : selectedSubject.id === "updates"
-                ? "CLG_UPDATES"
+                ? "COLLEGE_UPDATE"
                 : "",
             top_k: 3,
           }),

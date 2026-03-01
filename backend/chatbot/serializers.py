@@ -13,3 +13,11 @@ class ChatbotAskSerializer(serializers.Serializer):
         min_value=1,
         max_value=10
     )
+
+
+# ===================== NEW SERIALIZER =====================
+# For staff to post college updates
+# ==========================================================
+
+class CollegeUpdateSerializer(serializers.Serializer):
+    content = serializers.CharField(max_length=5000)
