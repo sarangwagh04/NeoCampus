@@ -37,11 +37,12 @@ export default function StaffDashboard() {
         <StaffProfileCard profile={data?.profile ?? null} isLoading={isLoading} />
 
         {/* Stat Cards */}
-        <StaffStatCards stats={data?.stats ?? null} isLoading={isLoading} todayClasses={data?.todayClasses ?? null} />
+        <StaffStatCards stats={data?.stats ?? null} isLoading={isLoading} todaySchedule={data?.todaySchedule ?? null} />
 
         {/* Today's Overview - Combined Classes & Schedule in single card */}
         <StaffTodayOverview
           classes={data?.todayClasses ?? null}
+          schedule={data?.todaySchedule ?? null}
           isLoading={isLoading}
           onMarkAttendance={markAttendance}
         />
@@ -50,7 +51,7 @@ export default function StaffDashboard() {
         <StaffAcademicResponsibilities />
 
         {/* Recent Assignments & Notes */}
-        <StaffRecentMaterials />
+        <StaffRecentMaterials materials={data?.recentMaterials ?? []}/>
       </div>
     </StaffDashboardLayout>
   );

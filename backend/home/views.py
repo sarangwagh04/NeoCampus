@@ -3,11 +3,12 @@
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from profiles.models import StudentProfile, StaffProfile
-from .serializers import StudentDashboardSerializer
+from .serializers import StaffDashboardProfileSerializer, StudentDashboardSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
+
 
 # ✅ NEW IMPORTS FOR STATS
 from attendance.models import (
@@ -26,6 +27,7 @@ from datetime import datetime, timedelta
 # ✅ NEW IMPORT FOR RECENT MATERIALS
 from noticeboard.models import Notice
 from django.utils import timezone
+from django.db.models import Count
 
 
 
@@ -261,3 +263,298 @@ class RecentMaterialsView(APIView):
             })
 
         return Response(data)
+    
+
+
+# =========================================================
+# ✅ NEW VIEW FOR STAFF DASHBOARD (SINGLE API)
+# =========================================================
+
+
+
+class StaffDashboardView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+
+
+
+        # =====================================================
+        # 1️⃣ Profile Card Data
+        # =====================================================
+        try:
+            staff_profile = StaffProfile.objects.get(user=request.user)
+        except StaffProfile.DoesNotExist:
+            return Response(
+                {"detail": "Staff profile not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = StaffDashboardProfileSerializer(
+            staff_profile,
+            context={"request": request}
+        )
+        # =====================================================
+        # 2️⃣ Stat Cards Data
+        # =====================================================
+        # =====================================================
+        # 1️⃣ SUBJECTS ASSIGNED
+        # attendance app → SubjectAssignment
+        # =====================================================
+
+        subject_assignments = SubjectAssignment.objects.filter(
+            staff=staff_profile
+        )
+
+        subjects_assigned_count = subject_assignments.count()
+
+        # =====================================================
+        # 2️⃣ CLASSES TODAY
+        # timetables app → Timetable (ONLY teacher + today)
+        # =====================================================
+
+        today_code = datetime.today().strftime("%a").upper()[:3]
+
+        today_classes_count = Timetable.objects.filter(
+            subject__teacher=staff_profile,
+            day=today_code
+        ).count()
+
+        # =====================================================
+        # 3️⃣ PENDING ENTRIES
+        # attendance app → TeachingPlan
+        # lecture_date < today
+        # and NO Attendance record exists
+        # =====================================================
+
+        from datetime import date
+
+        past_lectures = TeachingPlan.objects.filter(
+            assignment__staff=staff_profile,
+            lecture_date__lt=date.today()
+        )
+
+        pending_entries_count = 0
+
+        for lecture in past_lectures:
+            if not Attendance.objects.filter(
+                teaching_plan=lecture
+            ).exists():
+                pending_entries_count += 1
+
+        # =====================================================
+        # 4️⃣ STATS ARRAY (FRONTEND FORMAT)
+        # =====================================================
+
+        stats = [
+            {
+                "label": "Subjects Assigned",
+                "value": subjects_assigned_count,
+                "icon": "BookOpen",
+                "status": "success",
+                "href": "/staff/attendance#subjects",
+            },
+            {
+                "label": "Classes Today",
+                "value": today_classes_count,
+                "icon": "Calendar",
+                "status": "success",
+                "href": "/staff/timetable",
+            },
+            {
+                "label": "Pending Entries",
+                "value": pending_entries_count,
+                "icon": "Clock",
+                "status": "warning" if pending_entries_count > 0 else "success",
+                "href": "/staff/attendance#subjects",
+            },
+            {
+                # Countdown handled in frontend
+                "label": "Next Lecture",
+                "value": "countdown",
+                "icon": "GraduationCap",
+                "status": "success",
+                "href": "/staff/timetable",
+            },
+        ]
+
+
+        # =====================================================
+        # 4️⃣ TODAY SCHEDULE (timetable ONLY)
+        # =====================================================
+
+        schedule_entries = Timetable.objects.filter(
+            day=today_code
+        ).select_related("subject", "timeslot").order_by(
+            "timeslot__start_time"  # ✅ FIX ORDERING
+        )
+
+        today_schedule = []
+
+        for entry in schedule_entries:
+
+            timeslot = entry.timeslot
+
+            # Show only:
+            # - Break
+            # - OR teacher = logged in user
+            if not timeslot.is_break and (
+                not entry.subject or entry.subject.teacher != staff_profile
+            ):
+                continue
+
+            time_str = f"{timeslot.start_time.strftime('%H:%M')} - {timeslot.end_time.strftime('%H:%M')}"
+
+            if timeslot.is_break:
+                pass 
+                '''commented out this code beacuese we are handling break in frontend and it was creating confusion in UI. 
+                If you want to show break in backend then you can uncomment this code and remove the handling of break from frontend.'''
+                # today_schedule.append({
+                #     "id": f"break-{entry.id}",
+                #     "subject": timeslot.break_label,
+                #     "subjectCode": "",
+                #     "class": "",
+                #     "division": "",
+                #     "time": time_str,
+                #     "room": "",
+                #     "attendanceStatus": "marked",  # ignored in schedule UI
+                #     "totalStudents": 0,
+                # })
+            else:
+                today_schedule.append({
+                    "id": str(entry.id),
+                    "subject": entry.subject.name,
+                    "subjectCode": entry.subject.code,
+                    "class": entry.subject.branch,
+                    "division": "",
+                    "time": time_str,
+                    "room": entry.subject.classroom,
+                    "attendanceStatus": "pending",
+                    "totalStudents": 0,
+                })
+
+        # =====================================================
+        # 5️⃣ TODAY CLASSES (attendance ONLY)
+        # =====================================================
+
+        today_lectures = TeachingPlan.objects.filter(
+            assignment__staff=staff_profile,
+            lecture_date=date.today()
+        ).select_related("assignment__subject")
+
+        today_classes = []
+
+        for lecture in today_lectures:
+            
+            assignment = lecture.assignment
+            subject = lecture.assignment.subject
+            batch_id = lecture.assignment.batch_id
+            assignment_uuid = str(assignment.assignment_id)
+            lecture_id = lecture.id
+
+            attendance_records = Attendance.objects.filter(
+                teaching_plan=lecture
+            )
+
+            if attendance_records.exists():
+                attendance_status = "marked"
+                total_students = attendance_records.count()
+                present_students = attendance_records.filter(
+                    is_present=True
+                ).count()
+            else:
+                attendance_status = "pending"
+                total_students = 0
+                present_students = None
+
+            today_classes.append({
+                "id": f"lecture-{lecture.id}",
+                "assignmentId": assignment_uuid,
+                "lectureId": lecture_id,
+                "subject": subject.name,
+                "subjectCode": subject.code,
+                "class": batch_id,  # ✅ FIXED FULL BATCH-ID
+                "division": "",
+                "time": "",        # ✅ REMOVED (as requested)
+                "room": "",        # ✅ REMOVED (as requested)
+                "attendanceStatus": attendance_status,
+                "totalStudents": total_students,
+                "presentStudents": present_students,
+            })
+
+        
+
+        # =====================================================
+        # 6️⃣ RECENT MATERIALS (NEW SECTION ADDED)
+        # =====================================================
+
+        # ✅ Fetch only notices uploaded by this staff
+        # uploaded_by stores staff full name
+        staff_full_name = f"{staff_profile.first_name} {staff_profile.last_name}"
+
+        recent_notices = Notice.objects.filter(
+            uploaded_by=staff_full_name
+        ).annotate(
+            files_count=Count("files")
+        ).order_by(
+            "-created_at"
+        )[:5]  # Limit to latest 5
+
+        recent_materials = []
+
+        for notice in recent_notices:
+            recent_materials.append({
+                "id": str(notice.id),
+                "title": notice.title,
+                "subjectName": notice.subject_name,
+                "subjectCode": notice.subject_code,
+                "targetClass": notice.batch_id,
+                "uploadedAt": notice.created_at.strftime("%d %b %Y"),
+                "filesCount": notice.files_count,
+                "status": "published",  # Notice model has no draft field
+            })
+
+        # =====================================================
+        # 6️⃣ STATS
+        # =====================================================
+
+        stats = [
+            {
+                "label": "Subjects Assigned",
+                "value": subjects_assigned_count,
+                "icon": "BookOpen",
+                "status": "success",
+                "href": "/staff/attendance#subjects",
+            },
+            {
+                "label": "Classes Today",
+                "value": today_classes_count,
+                "icon": "Calendar",
+                "status": "success",
+                "href": "/staff/timetable",
+            },
+            {
+                "label": "Pending Entries",
+                "value": pending_entries_count,
+                "icon": "Clock",
+                "status": "warning" if pending_entries_count > 0 else "success",
+                "href": "/staff/attendance#subjects",
+            },
+            {
+                "label": "Next Lecture",
+                "value": "countdown",
+                "icon": "GraduationCap",
+                "status": "success",
+                "href": "/staff/timetable",
+            },
+        ]
+
+
+        return Response({
+            "profile": serializer.data,
+            "stats": stats,
+            "recentMaterials": recent_materials,
+            "todaySchedule": today_schedule,
+            "todayClasses": today_classes,
+            "announcements": []
+        })
