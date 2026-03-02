@@ -84,7 +84,7 @@ role-based access control into one unified platform.
 
 ### 1️⃣ Clone Repository
 
-git clone https://github.com/YOUR_USERNAME/NeoCampus.git cd NeoCampus
+git clone https://github.com/sarangwagh04/NeoCampus.git cd NeoCampus
 
 ### 2️⃣ Create Virtual Environment
 
