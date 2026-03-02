@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from chatbot.utils.similarity import similarity_search
-from chatbot.services.gemini import generate_answer
+# from chatbot.services.gemini import generate_answer #for reduce runservertime
 from rest_framework.permissions import IsAuthenticated
 from chatbot.models import Chunk
 from chatbot.serializers import (

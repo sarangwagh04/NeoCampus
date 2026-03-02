@@ -16,51 +16,10 @@ interface RecentMaterial {
   status: "published" | "draft";
 }
 
-const recentMaterials: RecentMaterial[] = [
-  {
-    id: "1",
-    title: "Unit 2 - Trees and Graphs",
-    subjectName: "Data Structures",
-    subjectCode: "CS301",
-    targetClass: "S.E. - Div A",
-    uploadedAt: "2 hours ago",
-    filesCount: 2,
-    status: "published",
-  },
-  {
-    id: "2",
-    title: "Hashing Techniques",
-    subjectName: "Data Structures",
-    subjectCode: "CS301",
-    targetClass: "S.E. - Div B",
-    uploadedAt: "1 day ago",
-    filesCount: 1,
-    status: "published",
-  },
-  {
-    id: "3",
-    title: "Process Scheduling Draft",
-    subjectName: "Operating Systems",
-    subjectCode: "CS302",
-    targetClass: "T.E. - Div A",
-    uploadedAt: "2 days ago",
-    filesCount: 1,
-    status: "draft",
-  },
-  {
-    id: "4",
-    title: "SQL Joins and Subqueries",
-    subjectName: "Database Management",
-    subjectCode: "CS303",
-    targetClass: "S.E. - All Divisions",
-    uploadedAt: "3 days ago",
-    filesCount: 3,
-    status: "published",
-  },
-];
 
-export function StaffRecentMaterials() {
-  const publishedCount = recentMaterials.filter((m) => m.status === "published").length;
+
+export function StaffRecentMaterials({ materials }: { materials: RecentMaterial[] }) {
+  const publishedCount = materials.filter((m) => m.status === "published").length;
 
   return (
     <Card className="card-shadow animate-fade-in">
@@ -76,9 +35,25 @@ export function StaffRecentMaterials() {
         </div>
       </CardHeader>
       <CardContent>
+        {materials.length === 0 && (
+          /* =====================================================
+             ✅ EMPTY STATE ADDED (NO VISUAL CHANGE TO DESIGN)
+          ===================================================== */
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <FileText className="h-10 w-10 text-muted-foreground mb-3" />
+            <h4 className="text-sm font-medium text-foreground">
+              No Materials Uploaded
+            </h4>
+            <p className="text-xs text-muted-foreground mt-1">
+              You haven’t uploaded any materials yet.
+            </p>
+          </div>
+        )}
+
+        {materials.length > 0 && (
         <ScrollArea className="h-[280px] pr-4">
           <div className="space-y-3">
-            {recentMaterials.map((material, index) => (
+            {materials.map((material, index) => (
               <div
                 key={material.id}
                 className={cn(
@@ -128,7 +103,7 @@ export function StaffRecentMaterials() {
               </div>
             ))}
           </div>
-        </ScrollArea>
+        </ScrollArea>)}
         <Link 
           to="/staff/materials"
           className="block w-full mt-4 py-2 text-sm text-center text-primary hover:bg-primary/5 rounded-lg transition-colors"

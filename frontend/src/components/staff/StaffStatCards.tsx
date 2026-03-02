@@ -43,7 +43,7 @@ const statusColors = {
 interface StaffStatCardsProps {
   stats: StaffStat[] | null;
   isLoading: boolean;
-  todayClasses?: TodayClass[] | null;
+  todaySchedule?: TodayClass[] | null;
 }
 
 function useCountdown(todayClasses: TodayClass[] | null | undefined) {
@@ -100,8 +100,8 @@ function useCountdown(todayClasses: TodayClass[] | null | undefined) {
   return { countdown, nextClass };
 }
 
-export function StaffStatCards({ stats, isLoading, todayClasses }: StaffStatCardsProps) {
-  const { countdown, nextClass } = useCountdown(todayClasses);
+export function StaffStatCards({ stats, isLoading, todaySchedule }: StaffStatCardsProps) {
+  const { countdown, nextClass } = useCountdown(todaySchedule);
   
   // Limit to 4 stat cards
   const displayStats = stats?.slice(0, 4) ?? [];

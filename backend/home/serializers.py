@@ -46,3 +46,34 @@ class StudentDashboardSerializer(serializers.ModelSerializer):
         if obj.profile_picture and request:
             return request.build_absolute_uri(obj.profile_picture.url)
         return None
+
+
+
+# =========================================================
+# ✅ NEW SERIALIZER FOR STAFF DASHBOARD
+# =========================================================
+
+class StaffDashboardProfileSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+    staffId = serializers.CharField(source="user.username")
+    department = serializers.CharField(source="branch")
+    avatar = serializers.SerializerMethodField()
+
+    class Meta:
+        model = StaffProfile
+        fields = [
+            "name",
+            "staffId",
+            "department",
+            "designation",
+            "avatar",
+        ]
+
+    def get_name(self, obj):
+        return f"{obj.first_name} {obj.last_name}"
+
+    def get_avatar(self, obj):
+        request = self.context.get("request")
+        if obj.profile_picture and request:
+            return request.build_absolute_uri(obj.profile_picture.url)
+        return None
