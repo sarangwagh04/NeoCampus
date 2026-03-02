@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { FileText, Sparkles, Check, Lock, Zap, Brain, TrendingUp, BarChart3 } from "lucide-react";
+import { FileText, Sparkles, Check, Lock, Zap, Brain, TrendingUp, BarChart3, FlaskConical, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SparkleParticles } from "@/components/ui/sparkle-particles";
 import type { AnalysisMethod } from "@/hooks/useResultAnalysis";
+import * as XLSX from "xlsx";
 
 interface AnalysisMethodSelectorProps {
   onSelect: (method: AnalysisMethod) => void;
@@ -14,6 +15,53 @@ interface AnalysisMethodSelectorProps {
 
 export function AnalysisMethodSelector({ onSelect }: AnalysisMethodSelectorProps) {
   const [isHoveringAI, setIsHoveringAI] = useState(false);
+  
+  const [isTryoutProcessing, setIsTryoutProcessing] = useState(false);
+  const tryoutFileRef = useRef<HTMLInputElement>(null);
+  const handleTryoutFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    setIsTryoutProcessing(true);
+    
+    // Simulate processing delay
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    try {
+      // Generate mock analysis output
+      const outputData = [
+        ["Sr No", "Subject", "Exam Head", "Appeared", "Passed", "Failed", "Pass %", "Teacher"],
+        [1, "Engineering Mathematics-III", "TH", 65, 58, 7, "89.23%", "Dr. S. K. Sharma"],
+        [2, "Data Structures", "TH", 65, 52, 13, "80.00%", "Prof. A. R. Patel"],
+        [3, "Data Structures", "PR", 65, 63, 2, "96.92%", "Prof. A. R. Patel"],
+        [4, "Digital Logic Design", "TH", 65, 55, 10, "84.62%", "Dr. M. V. Kulkarni"],
+        [5, "Computer Organization", "TH", 65, 48, 17, "73.85%", "Prof. R. S. Jain"],
+        [6, "Discrete Mathematics", "TH", 65, 60, 5, "92.31%", "Dr. P. K. Verma"],
+      ];
+      const summaryData = [
+        ["Class", "Appeared", "FCD", "FC", "HSC", "SC", "Pass Class", "Total Pass", "Remark"],
+        ["S.E.", 65, 8, 20, 15, 12, 5, 60, "Satisfactory"],
+      ];
+      const topperData = [
+        ["Rank", "Name", "SGPA"],
+        [1, "Priya Sharma", 9.85],
+        [2, "Rahul Verma", 9.72],
+        [3, "Ananya Patel", 9.65],
+      ];
+      const wb = XLSX.utils.book_new();
+      const ws1 = XLSX.utils.aoa_to_sheet(outputData);
+      const ws2 = XLSX.utils.aoa_to_sheet(summaryData);
+      const ws3 = XLSX.utils.aoa_to_sheet(topperData);
+      
+      XLSX.utils.book_append_sheet(wb, ws1, "Subject Analysis");
+      XLSX.utils.book_append_sheet(wb, ws2, "Class Summary");
+      XLSX.utils.book_append_sheet(wb, ws3, "Toppers");
+      
+      XLSX.writeFile(wb, "AI_Result_Analysis_Preview.xlsx");
+    } finally {
+      setIsTryoutProcessing(false);
+      if (tryoutFileRef.current) tryoutFileRef.current.value = "";
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -145,22 +193,52 @@ export function AnalysisMethodSelector({ onSelect }: AnalysisMethodSelectorProps
             
             <div className="pt-2 border-t border-violet-200/50 dark:border-violet-800/50">
               <p className="text-xs text-muted-foreground mb-3">
-                Pricing: <span className="font-medium bg-gradient-to-r from-violet-600 to-purple-600 dark:from-violet-400 dark:to-purple-400 bg-clip-text text-transparent">₹199 / Analysis</span> or Institution Plan
+                Pricing: <span className="font-medium bg-gradient-to-r from-violet-600 to-purple-600 dark:from-violet-400 dark:to-purple-400 bg-clip-text text-transparent">₹99 / Analysis</span> or Institution Plan
               </p>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button 
-                    className="w-full bg-gradient-to-r from-violet-500/20 to-purple-500/20 text-violet-700 dark:text-violet-300 border border-violet-300 dark:border-violet-700 hover:from-violet-500/30 hover:to-purple-500/30 cursor-not-allowed" 
-                    variant="outline"
-                  >
-                    <Lock className="h-4 w-4 mr-2" />
-                    Coming Soon
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>This feature will be available in a future update.</p>
-                </TooltipContent>
-              </Tooltip>
+              <div className="flex gap-2">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      className="flex-1 bg-gradient-to-r from-violet-500/20 to-purple-500/20 text-violet-700 dark:text-violet-300 border border-violet-300 dark:border-violet-700 hover:from-violet-500/30 hover:to-purple-500/30 cursor-not-allowed" 
+                      variant="outline"
+                    >
+                      <Lock className="h-4 w-4 mr-2" />
+                      Coming Soon
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>This feature will be available in a future update.</p>
+                  </TooltipContent>
+                </Tooltip>
+                
+                <input
+                  ref={tryoutFileRef}
+                  type="file"
+                  accept=".pdf"
+                  onChange={handleTryoutFile}
+                  className="hidden"
+                />
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="border-violet-300 dark:border-violet-700 text-violet-600 dark:text-violet-400 hover:bg-violet-500/10"
+                      onClick={() => tryoutFileRef.current?.click()}
+                      disabled={isTryoutProcessing}
+                    >
+                      {isTryoutProcessing ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        <FlaskConical className="h-3.5 w-3.5" />
+                      )}
+                      Try
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Upload a PDF to preview AI analysis output</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
             </div>
           </CardContent>
         </Card>
