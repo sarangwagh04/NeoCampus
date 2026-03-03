@@ -7,7 +7,7 @@ import { FileText, Sparkles, Check, Lock, Zap, Brain, TrendingUp, BarChart3, Fla
 import { cn } from "@/lib/utils";
 import { SparkleParticles } from "@/components/ui/sparkle-particles";
 import type { AnalysisMethod } from "@/hooks/useResultAnalysis";
-import * as XLSX from "xlsx";
+// import * as XLSX from "xlsx";
 
 interface AnalysisMethodSelectorProps {
   onSelect: (method: AnalysisMethod) => void;
@@ -18,45 +18,57 @@ export function AnalysisMethodSelector({ onSelect }: AnalysisMethodSelectorProps
   
   const [isTryoutProcessing, setIsTryoutProcessing] = useState(false);
   const tryoutFileRef = useRef<HTMLInputElement>(null);
+
   const handleTryoutFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    
+
     setIsTryoutProcessing(true);
-    
-    // Simulate processing delay
-    await new Promise(resolve => setTimeout(resolve, 2000));
+
     try {
-      // Generate mock analysis output
-      const outputData = [
-        ["Sr No", "Subject", "Exam Head", "Appeared", "Passed", "Failed", "Pass %", "Teacher"],
-        [1, "Engineering Mathematics-III", "TH", 65, 58, 7, "89.23%", "Dr. S. K. Sharma"],
-        [2, "Data Structures", "TH", 65, 52, 13, "80.00%", "Prof. A. R. Patel"],
-        [3, "Data Structures", "PR", 65, 63, 2, "96.92%", "Prof. A. R. Patel"],
-        [4, "Digital Logic Design", "TH", 65, 55, 10, "84.62%", "Dr. M. V. Kulkarni"],
-        [5, "Computer Organization", "TH", 65, 48, 17, "73.85%", "Prof. R. S. Jain"],
-        [6, "Discrete Mathematics", "TH", 65, 60, 5, "92.31%", "Dr. P. K. Verma"],
-      ];
-      const summaryData = [
-        ["Class", "Appeared", "FCD", "FC", "HSC", "SC", "Pass Class", "Total Pass", "Remark"],
-        ["S.E.", 65, 8, 20, 15, 12, 5, 60, "Satisfactory"],
-      ];
-      const topperData = [
-        ["Rank", "Name", "SGPA"],
-        [1, "Priya Sharma", 9.85],
-        [2, "Rahul Verma", 9.72],
-        [3, "Ananya Patel", 9.65],
-      ];
-      const wb = XLSX.utils.book_new();
-      const ws1 = XLSX.utils.aoa_to_sheet(outputData);
-      const ws2 = XLSX.utils.aoa_to_sheet(summaryData);
-      const ws3 = XLSX.utils.aoa_to_sheet(topperData);
-      
-      XLSX.utils.book_append_sheet(wb, ws1, "Subject Analysis");
-      XLSX.utils.book_append_sheet(wb, ws2, "Class Summary");
-      XLSX.utils.book_append_sheet(wb, ws3, "Toppers");
-      
-      XLSX.writeFile(wb, "AI_Result_Analysis_Preview.xlsx");
+      // ================================
+      // 🔁 CHANGED: Removed mock delay
+      // Previously: Simulated 2-second delay
+      // Now: Real backend call
+      // ================================
+
+      // ================================
+      // 🔁 CHANGED: Removed mock Excel generation logic
+      // Previously: Local XLSX generation using hardcoded arrays
+      // Now: Send PDF to backend AI endpoint
+      // ================================
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("/api/result-analysis/ai-tryout/", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to process PDF");
+      }
+
+      // ================================
+      // 🔁 NEW: Handle Excel file returned from backend
+      // ================================
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "AI_Result_Analysis.xlsx";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      window.URL.revokeObjectURL(url);
+
+    } catch (error) {
+      console.error("AI Tryout Error:", error);
+      alert("Failed to process PDF. Please try again.");
     } finally {
       setIsTryoutProcessing(false);
       if (tryoutFileRef.current) tryoutFileRef.current.value = "";
