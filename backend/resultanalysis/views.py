@@ -59,3 +59,48 @@ class ResultAnalysisAPIView(GenericAPIView):
         finally:
             if os.path.exists(tmp_path):
                 os.remove(tmp_path)
+
+
+
+from rest_framework.decorators import api_view
+from django.http import HttpResponse
+from rest_framework.response import Response
+
+from .ai_processor import (
+    pdf_first_page_to_image,
+    extract_csv_from_image,
+    csv_to_excel_file
+)
+
+
+@api_view(["POST"])
+def ai_tryout_analysis(request):
+    pdf_file = request.FILES.get("file")
+
+    if not pdf_file:
+        return Response({"error": "No file uploaded"}, status=400)
+
+    try:
+        pdf_bytes = pdf_file.read()
+
+        # Step 1
+        image_bytes = pdf_first_page_to_image(pdf_bytes)
+
+        # Step 2
+        csv_text = extract_csv_from_image(image_bytes)
+
+        # Step 3
+        excel_file = csv_to_excel_file(csv_text)
+
+        response = HttpResponse(
+            excel_file,
+            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+        response["Content-Disposition"] = (
+            'attachment; filename="AI_Result_Analysis.xlsx"'
+        )
+
+        return response
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)

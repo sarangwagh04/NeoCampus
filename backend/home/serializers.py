@@ -50,7 +50,7 @@ class StudentDashboardSerializer(serializers.ModelSerializer):
 
 
 # =========================================================
-# ✅ NEW SERIALIZER FOR STAFF DASHBOARD
+# SERIALIZER FOR STAFF DASHBOARD
 # =========================================================
 
 class StaffDashboardProfileSerializer(serializers.ModelSerializer):
