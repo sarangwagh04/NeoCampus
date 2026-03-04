@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.db import models
 import pandas as pd
 from datetime import datetime
+from django.http import HttpResponse
 
 from profiles.models import StudentProfile, StaffProfile  # import from your profiles app
 
@@ -255,6 +256,7 @@ class DummyStaffModel(models.Model):
 # ---------- Base Upload Admin ----------
 class BaseUploadAdmin(admin.ModelAdmin):
     upload_function = None
+    template_function = None
     section_title = ""
     upload_name = ""
     template_name = "admin/upload_excel.html"
