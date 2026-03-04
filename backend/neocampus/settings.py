@@ -41,6 +41,7 @@ INTERNAL_IPS = [
 # Application definition
 
 INSTALLED_APPS = [
+    "jazzmin", # Jazzmin for Admin UI Customization - Sarang
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -131,6 +132,10 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
@@ -160,4 +165,74 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "AUTH_HEADER_TYPES": ("Bearer",),
+}
+
+
+
+#---------------------------------------
+# Django Jaszmin Admin Customization Settings
+#---------------------------------------
+# ADMIN_SITE_TITLE = "NeoCampus Admin"
+# ADMIN_SITE_HEADER = "NeoCampus Admin"
+
+JAZZMIN_SETTINGS = {
+    
+
+    "site_title": "NeoCampus",
+    "site_header": "NeoCampus Admin -B",
+    "site_brand": "NeoCampus Admin",
+
+    "site_logo": "images/favicon.svg",
+    "site_icon": "images/favicon.svg",
+    "site_logo_classes": "img-circle elevation-3",
+    
+
+    "welcome_sign": "Welcome to NeoCampus Admin Panel",
+
+    "show_sidebar": True,
+    "navigation_expanded": True,
+    "sidebar_fixed": True,
+    "navbar_fixed": True,
+    "footer_fixed": True,
+    "navigation_expanded": True,
+    "theme": "lux",
+
+    "sidebar": {
+        "show_search": True,
+        "show_all_applications": True,
+    },
+
+    "show_ui_builder": False,
+
+    "order_with_respect_to": [
+        "accounts",
+        "profiles",
+        "attendance",
+        "results",
+        "resultanalysis",
+        "timetables",
+        "noticeboard",
+        "chatbot",
+    ],
+
+    "icons": {
+        "accounts": "fas fa-user",
+        "profiles": "fas fa-id-card",
+        "attendance": "fas fa-calendar-check",
+        "results": "fas fa-poll",
+        "resultanalysis": "fas fa-chart-line",
+        "timetables": "fas fa-clock",
+        "noticeboard": "fas fa-bullhorn",
+        "chatbot": "fas fa-robot",
+        "auth": "fas fa-users-cog",
+    },
+
+    "custom_links": {
+        "accounts": [{
+            "name": "Manage Users",
+            "url": "admin:accounts_user_changelist",
+            "icon": "fas fa-users",
+            "permissions": ["accounts.view_user"]
+        }],
+    },
 }
