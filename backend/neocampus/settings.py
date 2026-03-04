@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 
 from pathlib import Path
-import os
 
 # Load environment variables FIRST
 from dotenv import load_dotenv
@@ -21,6 +20,11 @@ load_dotenv()
 # THEN import decouple
 from decouple import config
 from datetime import timedelta
+
+#For deployement
+import os
+import dj_database_url
+
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -31,7 +35,9 @@ SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", default=False, cast=bool)
 
-ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="").split(",")
+# ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="").split(",") #for deployment commented out
+ALLOWED_HOSTS = ["*"]
+
 
 INTERNAL_IPS = [
     "127.0.0.1","localhost",
@@ -63,6 +69,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware', #for deployment
+    'whitenoise.middleware.WhiteNoiseMiddleware', #for deployment
     "corsheaders.middleware.CorsMiddleware", #-ReaactJS
     "debug_toolbar.middleware.DebugToolbarMiddleware", # Django Debug Toolbar for API Trakcing - Sarang
     'django.middleware.security.SecurityMiddleware',
@@ -94,16 +102,20 @@ TEMPLATES = [
 WSGI_APPLICATION = 'neocampus.wsgi.application'
 
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": config("DB_NAME"),
+#         "USER": config("DB_USER"),
+#         "PASSWORD": config("DB_PASSWORD"),
+#         "HOST": config("DB_HOST"),
+#         "PORT": config("DB_PORT", cast=int),
+#     }
+# } #for local system
+
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": config("DB_NAME"),
-        "USER": config("DB_USER"),
-        "PASSWORD": config("DB_PASSWORD"),
-        "HOST": config("DB_HOST"),
-        "PORT": config("DB_PORT", cast=int),
-    }
-}
+    "default": dj_database_url.config(default=os.environ.get("DATABASE_URL"))
+} #for deployment
 
 
 AUTH_PASSWORD_VALIDATORS = [
