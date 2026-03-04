@@ -129,7 +129,7 @@ def create_students_from_excel(df):
                     "semester": semester,
                     "admission_year": admission_year,
                     "batch_id": f"{branch}_{admission_year}",
-                    "roll": str(int(roll_no)).zfill(3),
+                    "role": "Student",
                     "mobile_number": mobile_number,
                     "address": address,
                     "parents_name": parents_name,
@@ -223,6 +223,7 @@ def create_staff_from_excel(df):
                     "emergency_name": emergency_name,
                     "emergency_mobile_number": emergency_mobile_number,
                     "emergency_relation": emergency_relation,
+                    "role": "Staff",
                 },
             )
 
@@ -256,21 +257,24 @@ class DummyStaffModel(models.Model):
 # ---------- Base Upload Admin ----------
 class BaseUploadAdmin(admin.ModelAdmin):
     upload_function = None
-    template_function = None
+    template_function = None   # NEW
     section_title = ""
     upload_name = ""
     template_name = "admin/upload_excel.html"
 
-    def has_add_permission(self, request):
-        return False
-
-    def has_change_permission(self, request, obj=None):
-        return True
-
     def get_urls(self):
         urls = super().get_urls()
         extra_urls = [
-            path("upload-excel/", self.admin_site.admin_view(self.upload_excel), name=self.upload_name),
+            path(
+                "upload-excel/",
+                self.admin_site.admin_view(self.upload_excel),
+                name=self.upload_name,
+            ),
+            path(
+                "download-template/",
+                self.admin_site.admin_view(self.download_template),
+                name=f"{self.upload_name}_template",
+            ),
         ]
         return extra_urls + urls
 
@@ -302,19 +306,79 @@ class BaseUploadAdmin(admin.ModelAdmin):
             **self.admin_site.each_context(request),
             "form": form,
             "title": self.section_title,
+            "template_download_url": f"admin:{self.upload_name}_template",
         }
         return TemplateResponse(request, self.template_name, context)
+    
+    def download_template(self, request):
+        df = self.template_function()
+
+        response = HttpResponse(
+            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+        response["Content-Disposition"] = f'attachment; filename="{self.upload_name}_template.xlsx"'
+
+        df.to_excel(response, index=False)
+
+        return response
+
+
+
+
+def staff_template():
+    columns = [
+        "first_name",
+        "middle_name",
+        "last_name",
+        "email",
+        "branch",
+        "designation",
+        "qualifications",
+        "joined_year",
+        "dob",
+        "gender",
+        "profile_picture",
+        "mobile_number",
+        "address",
+        "emergency_name",
+        "emergency_mobile_number",
+        "emergency_relation",
+    ]
+
+    return pd.DataFrame(columns=columns)
+
+def student_template():
+    columns = [
+            "first_name",
+            "middle_name",
+            "last_name",
+            "email",
+            "branch",
+            "semester",
+            "admission_year",
+            "dob",
+            "gender",
+            "profile_picture",
+            "mobile_number",
+            "address",
+            "parents_name",
+            "parents_mobile_number",
+        ]
+
+    return pd.DataFrame(columns=columns)
 
 
 # ---------- Final Admin Registration ----------
 class StudentUploadAdmin(BaseUploadAdmin):
     upload_function = staticmethod(create_students_from_excel)
+    template_function = staticmethod(student_template)
     section_title = "Upload Students Excel"
     upload_name = "upload_students_excel"
 
 
 class StaffUploadAdmin(BaseUploadAdmin):
     upload_function = staticmethod(create_staff_from_excel)
+    template_function = staticmethod(staff_template)
     section_title = "Upload Staff Excel"
     upload_name = "upload_staff_excel"
 
