@@ -1,10 +1,17 @@
 import os
+import string
 import time
 import psutil
 from django.core.management.base import BaseCommand
 from django.contrib.auth import authenticate
 from django.conf import settings
 from django.contrib.auth import get_user_model
+
+from rest_framework.test import APIRequestFactory
+from home.views import LoginView
+
+from rest_framework_simplejwt.tokens import RefreshToken
+import json
 
 User = get_user_model()
 
@@ -18,6 +25,7 @@ class Command(BaseCommand):
 
         while True:
             current_drives = self.get_removable_drives()
+            print("Current Drives:", current_drives)
             new_drives = current_drives - known_drives
 
             for drive in new_drives:
@@ -26,11 +34,13 @@ class Command(BaseCommand):
             known_drives = current_drives
             time.sleep(2)
 
+
     def get_removable_drives(self):
         drives = set()
-        for partition in psutil.disk_partitions():
-            if 'removable' in partition.opts.lower():
-                drives.add(partition.device)
+        for letter in string.ascii_uppercase:
+            drive = f"{letter}:/"
+            if os.path.exists(drive):
+                drives.add(drive)
         return drives
 
     def process_drive(self, drive):
@@ -62,20 +72,37 @@ class Command(BaseCommand):
 
             if user:
                 self.stdout.write(self.style.SUCCESS(f"Authenticated: {college_id}"))
-                self.handle_success(user)
+                self.handle_success(college_id, password)
             else:
                 self.stdout.write(self.style.ERROR("Authentication Failed"))
 
         except Exception as e:
             self.stdout.write(self.style.ERROR(str(e)))
 
-    def handle_success(self, user):
-        # For now just print role
-        if user.is_superuser:
-            role = "admin"
-        elif hasattr(user, "staff_profile"):
-            role = "staff"
-        else:
-            role = "student"
 
-        self.stdout.write(self.style.SUCCESS(f"Redirect to {role} dashboard"))
+
+
+    def handle_success(self, username, password):
+        factory = APIRequestFactory()
+
+        request = factory.post(
+            "/api/auth/login/",
+            {
+                "username": username,
+                "password": password,
+            },
+            format="json"
+        )
+
+        view = LoginView.as_view()
+        response = view(request)
+
+        if response.status_code == 200:
+            import json
+            file_path = os.path.join(settings.BASE_DIR, "hardware_auth.json")
+            with open(file_path, "w") as f:
+                json.dump(response.data, f)
+
+            self.stdout.write(self.style.SUCCESS("Login API executed internally"))
+        else:
+            self.stdout.write(self.style.ERROR("Internal login failed"))

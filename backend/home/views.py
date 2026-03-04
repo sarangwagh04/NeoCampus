@@ -1,14 +1,19 @@
 # home/views.py
 
+import json
+import os
+from django.http import JsonResponse
+
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from profiles.models import StudentProfile, StaffProfile
 from .serializers import StaffDashboardProfileSerializer, StudentDashboardSerializer
-from rest_framework.views import APIView
+from rest_framework.views import APIView, settings
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-
+from django.conf import settings
+import os
 
 # ✅ NEW IMPORTS FOR STATS
 from attendance.models import (
@@ -55,6 +60,29 @@ class LoginView(TokenObtainPairView):
     serializer_class = CustomTokenSerializer
 
 
+def hardware_auth_status(request):
+    file_path = os.path.join(settings.BASE_DIR, "hardware_auth.json")
+
+    if not os.path.exists(file_path):
+        return JsonResponse({"status": "waiting"})
+
+    try:
+        with open(file_path, "r") as f:
+            data = json.load(f)
+
+        return JsonResponse(data)
+
+    except Exception as e:
+        print("Hardware auth read error:", str(e))
+        return JsonResponse({"status": "error"})
+
+
+
+
+def delete_hardware_auth(request):
+    if os.path.exists("hardware_auth.json"):
+        os.remove("hardware_auth.json")
+    return JsonResponse({"status": "deleted"})
 
 class StudentDashboardView(APIView):
     permission_classes = [IsAuthenticated]
