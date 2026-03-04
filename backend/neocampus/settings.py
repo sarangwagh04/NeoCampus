@@ -169,9 +169,9 @@ SIMPLE_JWT = {
 
 
 
-#---------------------------------------
+#--------------------------------------------
 # Django Jaszmin Admin Customization Settings
-#---------------------------------------
+#---------------------------------------------
 # ADMIN_SITE_TITLE = "NeoCampus Admin"
 # ADMIN_SITE_HEADER = "NeoCampus Admin"
 
