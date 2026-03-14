@@ -69,8 +69,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware', #for deployment
-    'whitenoise.middleware.WhiteNoiseMiddleware', #for deployment
+    # 'django.middleware.security.SecurityMiddleware', #for deployment
+    # 'whitenoise.middleware.WhiteNoiseMiddleware', #for deployment
     "corsheaders.middleware.CorsMiddleware", #-ReaactJS
     "debug_toolbar.middleware.DebugToolbarMiddleware", # Django Debug Toolbar for API Trakcing - Sarang
     'django.middleware.security.SecurityMiddleware',
@@ -102,20 +102,20 @@ TEMPLATES = [
 WSGI_APPLICATION = 'neocampus.wsgi.application'
 
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.postgresql",
-#         "NAME": config("DB_NAME"),
-#         "USER": config("DB_USER"),
-#         "PASSWORD": config("DB_PASSWORD"),
-#         "HOST": config("DB_HOST"),
-#         "PORT": config("DB_PORT", cast=int),
-#     }
-# } #for local system
-
 DATABASES = {
-    "default": dj_database_url.config(default=os.environ.get("DATABASE_URL"))
-} #for deployment
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": config("DB_NAME"),
+        "USER": config("DB_USER"),
+        "PASSWORD": config("DB_PASSWORD"),
+        "HOST": config("DB_HOST"),
+        "PORT": config("DB_PORT", cast=int),
+    }
+} #for local system
+
+# DATABASES = {
+#     "default": dj_database_url.config(default=os.environ.get("DATABASE_URL"))
+# } #for deployment
 
 
 AUTH_PASSWORD_VALIDATORS = [
