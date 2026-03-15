@@ -126,47 +126,6 @@ export function AnalysisReportView({
             </ScrollArea>
           </div>
 
-          {/* Class-Wise Summary */}
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold flex items-center gap-2">
-              <FileText className="h-5 w-5 text-primary" />
-              Class-Wise Result Summary
-            </h2>
-            
-            <div className="w-full overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-muted/50">
-                    <TableHead>Class</TableHead>
-                    <TableHead className="text-center">Appeared</TableHead>
-                    <TableHead className="text-center">FCD</TableHead>
-                    <TableHead className="text-center">FC</TableHead>
-                    <TableHead className="text-center">HSC</TableHead>
-                    <TableHead className="text-center">SC</TableHead>
-                    <TableHead className="text-center">PC</TableHead>
-                    <TableHead className="text-center">Total Pass</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {report.classSummary.map(cls => (
-                    <TableRow key={cls.className}>
-                      <TableCell className="font-medium">{cls.className}</TableCell>
-                      <TableCell className="text-center">{cls.appeared}</TableCell>
-                      <TableCell className="text-center">{cls.firstClassDistinction}</TableCell>
-                      <TableCell className="text-center">{cls.firstClass}</TableCell>
-                      <TableCell className="text-center">{cls.higherSecondClass}</TableCell>
-                      <TableCell className="text-center">{cls.secondClass}</TableCell>
-                      <TableCell className="text-center">{cls.passClass}</TableCell>
-                      <TableCell className="text-center font-semibold text-emerald-600 dark:text-emerald-400">
-                        {cls.totalPass}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </div>
-
           {/* Class Toppers */}
           <div className="space-y-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
