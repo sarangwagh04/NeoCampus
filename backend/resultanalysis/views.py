@@ -104,3 +104,51 @@ def ai_tryout_analysis(request):
 
     except Exception as e:
         return Response({"error": str(e)}, status=500)
+    
+
+
+
+
+
+#============================================
+# AI FULL PROCESSOR VIEW
+#============================================
+
+from .ai_full_processor import process_pdf_with_gemini
+
+
+@api_view(["POST"])
+def ai_extract_analysis(request):
+
+    pdf_file = request.FILES.get("file")
+    column_names = request.data.get("column_names", "")
+
+
+    if not pdf_file:
+        return Response(
+            {"error": "No file uploaded"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+
+        pdf_bytes = pdf_file.read()
+        result = process_pdf_with_gemini(pdf_bytes, column_names)
+
+        return Response(
+            {
+                "columns": result["columns"],
+                "rows": result["rows"],
+                "total_rows": result["total_rows"],
+                "processed_pages": result["processed_pages"],
+                "warning": result["warning"],
+            },
+            status=status.HTTP_200_OK
+        )
+
+    except Exception as e:
+
+        return Response(
+            {"error": str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
