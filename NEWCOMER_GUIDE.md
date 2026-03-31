@@ -1,78 +1,97 @@
-# NeoCampus Newcomer Guide
+# 🚀 NeoCampus: Developer & Newcomer Guide
 
-## High-level architecture
+Welcome to the NeoCampus engineering team! This guide is designed to get you up and running quickly, providing insights into our architectural choices, development patterns, and best practices.
 
-NeoCampus is split into two main applications:
+## 🏗️ High-Level Architecture
 
-- `backend/`: Django + Django REST Framework API server.
-- `frontend/`: React + TypeScript + Vite web application.
+NeoCampus is a decoupled full-stack application:
+- **Backend (`/backend`)**: A RESTful API built with Python, Django, and Django REST Framework (DRF).
+- **Frontend (`/frontend`)**: A modern Single Page Application (SPA) built with React 19, TypeScript, and Vite.
 
-The frontend consumes the backend's `/api/*` endpoints and uses JWT access + refresh tokens for authentication.
+Communication happens exclusively via REST over HTTP, secured by JWT (JSON Web Tokens).
 
-## Backend structure (`backend/`)
+---
 
-Core project setup:
-- `manage.py`: Django management entrypoint.
-- `neocampus/settings.py`: app registration, JWT config, PostgreSQL config, CORS/media/static setup.
-- `neocampus/urls.py`: main API URL routing.
+## 💻 Frontend Ecosystem (`/frontend`)
 
-Feature apps (each follows Django app conventions with `models.py`, `views.py`, `serializers.py`, `urls.py`):
-- `home`: authentication and dashboard APIs.
-- `profiles`: student/staff profile data.
-- `attendance`: subject assignment, teaching plans, attendance marking and reports.
-- `results`: result upload/publish plus student result views.
-- `resultanalysis`: result analysis endpoint and helpers.
-- `timetables`: student/staff timetable endpoints.
-- `noticeboard`: notices/materials APIs.
-- `chatbot`: RAG-style chatbot and staff college updates.
+The frontend is built for performance and maintainability.
 
-Media uploads are stored under `backend/media/`.
+### Key Technologies
+- **Vite & SWC**: Lightning-fast builds and Hot Module Replacement (HMR).
+- **TypeScript**: Strict static typing to catch errors at compile time.
+- **Tailwind CSS & Radix UI**: Highly customizable utility-first styling paired with unstyled, accessible UI primitives. 
+- **TanStack React Query**: Server-state management, caching, and synchronization.
+- **Framer Motion**: Smooth, physics-based animations.
 
-## Frontend structure (`frontend/`)
+### Directory Structure
+```text
+src/
+├── api/        # Axios instances and interceptor configurations
+├── components/ # Reusable UI pieces (Buttons, Cards) & domain components
+├── hooks/      # Custom React hooks (often wrapping React Query)
+├── pages/      # Route-level components (Dashboard, Results, etc.)
+├── utils/      # Pure functions, formatters, and export helpers (jsPDF)
+├── App.tsx     # Application root with global providers (Toaster, Themes)
+└── main.tsx    # React entrypoint
+```
 
-App shell and providers:
-- `src/main.tsx`: React entrypoint.
-- `src/App.tsx`: all routes + global providers (theme, query client, toaster, tooltip).
+### Request/Response Flow (Frontend)
+1. **Login**: User submits credentials; backend returns `access` and `refresh` tokens.
+2. **Storage**: Tokens are saved locally.
+3. **Interceptors**: `src/api/axios.ts` attaches `Authorization: Bearer <token>` to every outbound request.
+4. **Token Rotation**: If a request fails with `401 Unauthorized`, the Axios interceptor automatically pauses the queue, uses the `refresh` token to get a new `access` token, and replays the failed requests transparently.
 
-Organization approach:
-- `src/pages/`: route-level page components.
-- `src/components/`: reusable UI and feature components (auth, dashboard, attendance, chatbot, etc.).
-- `src/hooks/`: API/data hooks used by pages and components.
-- `src/api/axios.ts`: shared Axios instance with JWT attachment + refresh token flow.
-- `src/utils/`: helper utilities (PDF/report generation, logout helpers).
+---
 
-Build system:
-- Vite + SWC React plugin.
-- `@` alias points to `src/`.
+## ⚙️ Backend Ecosystem (`/backend`)
 
-## Request/response flow
+The backend follows a Modular Monolith approach, utilizing Django's "app" structure.
 
-1. User logs in from the frontend login page.
-2. Backend issues JWT tokens (`access` + `refresh`).
-3. Frontend stores tokens in `localStorage`.
-4. Axios interceptor adds `Authorization: Bearer <access_token>` on requests.
-5. On `401`, Axios tries refresh endpoint and retries original request.
+### Key Technologies
+- **Django & DRF**: Robust ORM, admin panel, and rapid API endpoint creation.
+- **PostgreSQL**: Primary relational data store.
+- **Simple JWT**: Handles standard JWT provisioning and validation.
+- **PyTorch / Transformers / Google Gemini**: Powers the AI chatbot capabilities.
 
-## Important newcomer gotchas
+### Application Modules
+Django models data based on specific domains (`apps`):
+- `home`: Authentication layer, user management, and high-level dashboard metrics.
+- `profiles`: Granular user data (Student vs. Staff profiles).
+- `attendance`: Models for Teaching Plans, Subject tracking, and Session attendance.
+- `results` & `resultanalysis`: Result uploading, storage, and statistical breakdown endpoints.
+- `timetables`: Daily schedule management APIs.
+- `noticeboard`: Core announcement mechanics.
+- `chatbot`: RAG (Retrieval-Augmented Generation) pipeline interacting with vector data and LLMs.
 
-- API route prefixes are not fully uniform (`/api/home/...`, `/api/attendance/...`, plus some apps included at `/api/`). Always verify endpoint paths in each app's `urls.py`.
-- Frontend Axios currently uses hardcoded backend origin (`http://127.0.0.1:8000`) in `src/api/axios.ts`; review this before deployment.
-- Backend expects env vars (DB credentials, `SECRET_KEY`, JWT-related settings, Gemini key for chatbot).
-- Chatbot depends on Google Gemini key and document chunk/embedding data in DB; without setup, chatbot features may fail.
+---
 
-## Practical onboarding plan
+## 🧠 Important Newcomer Gotchas
 
-1. Run backend first, verify `/admin/` and a few API endpoints.
-2. Run frontend and validate login + one student flow (dashboard/attendance).
-3. Read one full vertical slice end-to-end (example: `results` app backend + `useStudentResults` hook + `Results.tsx`).
-4. Learn data model relations in `profiles`, `attendance`, `results` first; these drive most features.
-5. Add logging/tests around one endpoint before major refactors.
+*   **API Routing**: Django app endpoints are aggregated in `backend/neocampus/urls.py`. Routes are typically prefixed (e.g., `/api/attendance/`, `/api/profiles/`), but always check individual `urls.py` in the app directory to be sure.
+*   **Environment Variables**: The system relies heavily on `.env` configuration. Ensure you have your `GEMINI_API_KEY` and DB credentials properly set up, or features like the Chatbot will fail or degrade gracefully.
+*   **Hardcoded Origins**: During local development, CORS config and Axios base URLs might point to `localhost:8000` / `localhost:5173`. We plan to move these entirely to `.env` files for production parity.
 
-## Suggested “learn next” topics
+---
 
-- Django REST Framework patterns used in this codebase (APIView, serializers, permissions).
-- JWT lifecycle and frontend token refresh behavior.
-- Attendance + results domain models and how they feed dashboard stats.
-- Chatbot retrieval pipeline (`pdf_chunker`, embeddings, similarity search, Gemini answer generation).
-- Frontend route guards (`ProtectedRoute`, `RoleGuard`) and role-specific navigation.
+## 📝 Daily Workflow & Best Practices
 
+### 1. Adding a New API Endpoint
+1. Go to the relevant Django app (e.g., `attendance`).
+2. Add necessary models in `models.py` & run `makemigrations` + `migrate`.
+3. Create a serializer in `serializers.py` to map Model instances to JSON.
+4. Add an `APIView` or `ViewSet` in `views.py`. Protect it heavily using `IsAuthenticated` and custom role checks (e.g., `IsStaff`).
+5. Route it in `urls.py`.
+
+### 2. Adding a Frontend Feature
+1. **API Hook**: Create a custom hook in `src/hooks/` combining `axios` and TanStack's `useQuery`/`useMutation` to fetch the data.
+2. **Component/Page**: Create the view in `src/pages/` or `src/components/`, ensuring it's fully typed with TypeScript.
+3. **Routing**: Add the page to `src/App.tsx`. Protect the route using contextual guards (`ProtectedRoute`, `RoleGuard`) if required.
+
+## 🎓 Recommended First Steps
+
+1. **Get it running**: Boot up both servers. Log in to the Django Admin (`/admin`), and verify basic DB operations.
+2. **Trace a Request**: Open the network tab. Trigger an attendance fetch on the frontend, watch the API call, and trace it through the backend `views.py`.
+3. **Understand the Auth Flow**: Study `src/api/axios.ts` to understand how the refresh token intercepts work—it's the core of the app's connectivity.
+4. **Explore the AI**: Look closely at `chatbot/views.py` to see how we integrate text embeddings and Gemini generation.
+
+Happy coding! 🚀
