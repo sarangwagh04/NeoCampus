@@ -73,11 +73,10 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    # 'django.middleware.security.SecurityMiddleware', #for deployment
-    # 'whitenoise.middleware.WhiteNoiseMiddleware', #for deployment
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     "corsheaders.middleware.CorsMiddleware", #-ReaactJS
     "debug_toolbar.middleware.DebugToolbarMiddleware", # Django Debug Toolbar for API Trakcing - Sarang
-    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
