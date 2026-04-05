@@ -35,12 +35,6 @@ src/
 └── main.tsx    # React entrypoint
 ```
 
-### Request/Response Flow (Frontend)
-1. **Login**: User submits credentials; backend returns `access` and `refresh` tokens.
-2. **Storage**: Tokens are saved locally.
-3. **Interceptors**: `src/api/axios.ts` attaches `Authorization: Bearer <token>` to every outbound request.
-4. **Token Rotation**: If a request fails with `401 Unauthorized`, the Axios interceptor automatically pauses the queue, uses the `refresh` token to get a new `access` token, and replays the failed requests transparently.
-
 ---
 
 ## ⚙️ Backend Ecosystem (`/backend`)
@@ -54,14 +48,13 @@ The backend follows a Modular Monolith approach, utilizing Django's "app" struct
 - **PyTorch / Transformers / Google Gemini**: Powers the AI chatbot capabilities.
 
 ### Application Modules
-Django models data based on specific domains (`apps`):
 - `home`: Authentication layer, user management, and high-level dashboard metrics.
 - `profiles`: Granular user data (Student vs. Staff profiles).
 - `attendance`: Models for Teaching Plans, Subject tracking, and Session attendance.
-- `results` & `resultanalysis`: Result uploading, storage, and statistical breakdown endpoints.
+- `resultanalysis`: Dual-mode result analysis system (Traditional PDF parsing & AI-enhanced processing). Handles complex data extraction and institutional reporting.
 - `timetables`: Daily schedule management APIs.
-- `noticeboard`: Core announcement mechanics.
-- `chatbot`: RAG (Retrieval-Augmented Generation) pipeline interacting with vector data and LLMs.
+- `noticeboard`: Core announcement mechanics with real-time updates.
+- `chatbot`: RAG (Retrieval-Augmented Generation) pipeline interacting with vector data (syllabus/PDFs) and Gemini LLM.
 
 ---
 
@@ -69,23 +62,11 @@ Django models data based on specific domains (`apps`):
 
 *   **API Routing**: Django app endpoints are aggregated in `backend/neocampus/urls.py`. Routes are typically prefixed (e.g., `/api/attendance/`, `/api/profiles/`), but always check individual `urls.py` in the app directory to be sure.
 *   **Environment Variables**: The system relies heavily on `.env` configuration. Ensure you have your `GEMINI_API_KEY` and DB credentials properly set up, or features like the Chatbot will fail or degrade gracefully.
-*   **Hardcoded Origins**: During local development, CORS config and Axios base URLs might point to `localhost:8000` / `localhost:5173`. We plan to move these entirely to `.env` files for production parity.
+*   **Hardcoded Origins**: CORS config and Axios base URLs are predominantly managed via `.env` files. Ensure `ALLOWED_HOSTS` and `VITE_API_URL` (if used) are properly aligned.
+*   **Deployment Assets**: `Procfile`, `runtime.txt`, and `build.sh` in the backend root are required for CI/CD pipelines and should be maintained alongside dependency updates.
+*   **Result Analysis Modes**: The "Traditional" analysis uses structured PDF parsing, while the "AI" mode utilizes Gemini for intelligent mapping. Both share the same `AnalysisReportView` component for UI consistency.
 
 ---
-
-## 📝 Daily Workflow & Best Practices
-
-### 1. Adding a New API Endpoint
-1. Go to the relevant Django app (e.g., `attendance`).
-2. Add necessary models in `models.py` & run `makemigrations` + `migrate`.
-3. Create a serializer in `serializers.py` to map Model instances to JSON.
-4. Add an `APIView` or `ViewSet` in `views.py`. Protect it heavily using `IsAuthenticated` and custom role checks (e.g., `IsStaff`).
-5. Route it in `urls.py`.
-
-### 2. Adding a Frontend Feature
-1. **API Hook**: Create a custom hook in `src/hooks/` combining `axios` and TanStack's `useQuery`/`useMutation` to fetch the data.
-2. **Component/Page**: Create the view in `src/pages/` or `src/components/`, ensuring it's fully typed with TypeScript.
-3. **Routing**: Add the page to `src/App.tsx`. Protect the route using contextual guards (`ProtectedRoute`, `RoleGuard`) if required.
 
 ## 🎓 Recommended First Steps
 

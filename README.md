@@ -80,9 +80,9 @@ NeoCampus embraces a **Modular Monolith** pattern on the backend and a **Compone
 ## 🚀 Getting Started
 
 ### Prerequisites
-*   Node.js (v18+)
-*   Python (3.10+)
-*   PostgreSQL
+*   Node.js (v20+)
+*   Python (3.12+)
+*   PostgreSQL (v14+)
 *   A Google Gemini API Key (for AI features)
 
 ### 1️⃣ Clone the Repository
@@ -123,6 +123,16 @@ npm run dev
 ```
 
 The application will now be running. Navigate to `http://localhost:5173` to view the frontend, communicating with the backend at `http://localhost:8000`.
+
+---
+
+## 🌎 Deployment Readiness
+
+NeoCampus is configured for rapid deployment:
+*   **Production Server**: Uses `gunicorn` for robust backend serving (configured in `Procfile`).
+*   **Static Assets**: Integrated with `WhiteNoise` for efficient serving of frontend builds.
+*   **Automation**: `build.sh` script included for automated dependency sync and migrations.
+*   **Runtime**: `runtime.txt` specifies the exact Python version for environment parity.
 
 ---
 
