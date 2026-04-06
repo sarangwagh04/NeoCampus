@@ -18,11 +18,25 @@ useEffect(() => {
   const existingToken = localStorage.getItem("access_token");
   if (existingToken) return; // already logged in
 
-  const interval = setInterval(async () => {
-    try {
-      const res = await fetch(
-        "http://127.0.0.1:8000/api/home/hardware-auth-status/"
-      );
+    const initAuthCheck = async () => {
+      try {
+        // 1. Wake up the listener because we are on the landing page
+        await fetch("http://127.0.0.1:8000/api/home/hardware-listener-state/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ active: true })
+        });
+      } catch (err) {
+        console.error("Failed to wake up listener", err);
+      }
+    };
+    initAuthCheck();
+
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(
+          "http://127.0.0.1:8000/api/home/hardware-auth-status/"
+        );
       const data = await res.json();
 
       if (data.access) {

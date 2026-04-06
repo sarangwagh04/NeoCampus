@@ -55,6 +55,9 @@ const Login = () => {
         description: "Redirecting to dashboard",
       });
 
+      // ✅ Pause USB listener since user is now logged in
+      api.post("/auth/hardware-listener-state/", { active: false }).catch(console.error);
+
       // ✅ Redirect
       if (payload.is_staff) {
         navigate("/staff");

@@ -44,6 +44,7 @@ class StudentProfile(models.Model):
     # Meta
     date_created = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(blank=True, null=True)
+    hardware_public_key = models.TextField(blank=True, null=True, help_text="User's hardware public key for signature login")
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.user.username})"
@@ -90,6 +91,7 @@ class StaffProfile(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
+    hardware_public_key = models.TextField(blank=True, null=True, help_text="User's hardware public key for signature login")
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.user.username})"
@@ -97,3 +99,5 @@ class StaffProfile(models.Model):
     class Meta:
         verbose_name = "Staff Profile"
         verbose_name_plural = "Staff Profiles"
+
+

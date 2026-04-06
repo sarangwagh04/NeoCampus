@@ -2,6 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Settings, Clock } from "lucide-react";
 import { format } from "date-fns";
+import { HardwareKeyManager } from "./HardwareKeyManager";
+import { ChangePasswordManager } from "./ChangePasswordManager";
 
 interface SystemInfoSectionProps {
   profileCreatedAt: Date;
@@ -40,6 +42,13 @@ export function SystemInfoSection({
               <Clock className="w-4 h-4 text-muted-foreground" />
               {format(lastLoginAt, "MMMM d, yyyy 'at' h:mm a")}
             </div>
+          </div>
+        </div>
+
+        <div className="mt-6 pt-6 border-t border-dashed">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center">
+            <HardwareKeyManager />
+            <ChangePasswordManager />
           </div>
         </div>
       </CardContent>

@@ -2,7 +2,12 @@
 
 import json
 import os
+import string
+import base64
 from django.http import JsonResponse
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import ed25519
+from cryptography.exceptions import InvalidSignature
 
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -60,6 +65,55 @@ class LoginView(TokenObtainPairView):
     serializer_class = CustomTokenSerializer
 
 
+class HardwareSignatureLoginView(APIView):
+    """
+    Handles secure hardware login via digital signature verification.
+    """
+    permission_classes = [] # Allow unauthenticated attempts
+
+    def post(self, request):
+        username = request.data.get("username")
+        challenge = request.data.get("challenge")
+        signature_b64 = request.data.get("signature")
+
+        if not all([username, challenge, signature_b64]):
+            return Response({"error": "Missing parameters"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            from django.contrib.auth.models import User
+            user = User.objects.get(username=username)
+            
+            # 1. Fetch user's public key from Profile
+            profile = None
+            if hasattr(user, 'student_profile'):
+                profile = user.student_profile
+            elif hasattr(user, 'staff_profile'):
+                profile = user.staff_profile
+            
+            if not profile or not profile.hardware_public_key:
+                return Response({"error": "Hardware key not registered for this user"}, status=status.HTTP_401_UNAUTHORIZED)
+
+            # 2. Reconstruct Public Key
+            public_key = serialization.load_pem_public_key(
+                profile.hardware_public_key.encode('utf-8')
+            )
+
+            # 3. Verify Signature
+            signature = base64.b64decode(signature_b64)
+            public_key.verify(signature, challenge.encode('utf-8'))
+
+            # 4. If verification reaches here, it succeeded! Issue JWT
+            token = CustomTokenSerializer.get_token(user)
+            return Response({
+                'refresh': str(token),
+                'access': str(token.access_token),
+            })
+
+        except (User.DoesNotExist, InvalidSignature, Exception) as e:
+            print("❌ Hardware Auth Error:", str(e), type(e))
+            return Response({"error": "Hardware authentication failed"}, status=status.HTTP_401_UNAUTHORIZED)
+
+
 def hardware_auth_status(request):
     file_path = os.path.join(settings.BASE_DIR, "hardware_auth.json")
 
@@ -83,6 +137,114 @@ def delete_hardware_auth(request):
     if os.path.exists("hardware_auth.json"):
         os.remove("hardware_auth.json")
     return JsonResponse({"status": "deleted"})
+
+class GetDrivesView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        drives = []
+        for letter in string.ascii_uppercase:
+            drive = f"{letter}:/"
+            if os.path.exists(drive) and letter not in ['C']:
+                drives.append(drive)
+        return Response({"drives": drives})
+
+class ChangePasswordView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        old_password = request.data.get("old_password")
+        new_password = request.data.get("new_password")
+
+        if not old_password or not new_password:
+            return Response({"error": "Both old and new password are required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not user.check_password(old_password):
+            return Response({"error": "Incorrect old password"}, status=status.HTTP_400_BAD_REQUEST)
+
+        user.set_password(new_password)
+        user.save()
+        
+        return Response({"message": "Password updated successfully"})
+
+class RegisterHardwareKeyView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        drive_letter = request.data.get("drive")
+        if not drive_letter:
+            return Response({"error": "Drive letter is required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Format drive to be X:/ if needed
+        # Assuming the frontend sends just 'E' or 'E:/'
+        if len(drive_letter) == 1:
+            drive_path = f"{drive_letter}:/"
+        else:
+            drive_path = drive_letter
+
+        if not os.path.exists(drive_path):
+            return Response({"error": f"Drive {drive_path} not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            # 1. Generate Ed25519 key pair
+            private_key = ed25519.Ed25519PrivateKey.generate()
+            public_key = private_key.public_key()
+
+            # 2. Serialize keys
+            private_bytes = private_key.private_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PrivateFormat.PKCS8,
+                encryption_algorithm=serialization.NoEncryption()
+            )
+            
+            public_bytes = public_key.public_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PublicFormat.SubjectPublicKeyInfo
+            )
+
+            # 3. Save Private Key and Username to USB
+            usb_key_path = os.path.join(drive_path, "key.neocampus")
+            usb_user_path = os.path.join(drive_path, "user.neocampus")
+            
+            with open(usb_key_path, "wb") as f:
+                f.write(private_bytes)
+                
+            with open(usb_user_path, "w") as f:
+                f.write(request.user.username)
+            
+            # 4. Save Public Key to Django Profile
+            user = request.user
+            profile = None
+            if hasattr(user, 'student_profile'):
+                profile = user.student_profile
+            elif hasattr(user, 'staff_profile'):
+                profile = user.staff_profile
+                
+            if profile:
+                profile.hardware_public_key = public_bytes.decode('utf-8')
+                profile.save()
+                return Response({"status": "success", "message": "Hardware key registered successfully"})
+            else:
+                return Response({"error": "User profile not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class SetListenerStateView(APIView):
+    permission_classes = []
+
+    def post(self, request):
+        active_state = request.data.get("active", True)
+        
+        file_path = os.path.join(settings.BASE_DIR, "listener_state.json")
+        try:
+            with open(file_path, "w") as f:
+                json.dump({"active": active_state}, f)
+            return Response({"status": "success", "active": active_state})
+        except Exception as e:
+            return Response({"error": "Failed to update listener state"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 class StudentDashboardView(APIView):
     permission_classes = [IsAuthenticated]
