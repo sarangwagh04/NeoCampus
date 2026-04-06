@@ -3,6 +3,8 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Settings, CheckCircle2, XCircle, Calendar, Clock } from "lucide-react";
 import { format } from "date-fns";
+import { HardwareKeyManager } from "@/components/profile/HardwareKeyManager";
+import { ChangePasswordManager } from "@/components/profile/ChangePasswordManager";
 
 interface StaffSystemInfoSectionProps {
   isActive: boolean;
@@ -67,6 +69,14 @@ export function StaffSystemInfoSection({
         <p className="text-xs text-muted-foreground/70 italic pt-2">
           These fields are managed by the system and cannot be edited.
         </p>
+
+        <div className="mt-4 pt-4 border-t border-dashed">
+          <Label className="text-muted-foreground text-sm block mb-3">Security & Access</Label>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center">
+            <HardwareKeyManager />
+            <ChangePasswordManager />
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
