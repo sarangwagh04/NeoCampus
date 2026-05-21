@@ -13,17 +13,17 @@ const developers = [
     name: "Shubham Gadekar",
     title: "System Design",
     handle: "backend_dev",
-    avatarUrl: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=400&h=500&fit=crop&crop=face"
+    avatarUrl: "Shubham/avatars/shubham.jpeg"
   },
   {
     name: "Rushi Rajarupe",
     title: "Frontend Developer",
     handle: "fullstack_dev",
-    avatarUrl: "/avatars/rushi.heic"
+    avatarUrl: "/avatars/Rushi.jpeg"
   },
   {
     name: "Siddharth Wake",
-    title: "Full Stack Developer",
+    title: "Testing Engg.",
     handle: "system_dev",
     avatarUrl: "/avatars/siddharth.jpeg"
   }

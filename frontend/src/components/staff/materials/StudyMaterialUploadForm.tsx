@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import { FileUploadPreview } from "./FileUploadPreview";
 import { ReferenceLinkInput } from "./ReferenceLinkInput";
-import { useStaffStudyMaterials, StudyMaterialDraft } from "@/hooks/useStaffStudyMaterials";
+import { useStaffStudyMaterials } from "@/hooks/useStaffStudyMaterials";
 
 interface StudyMaterialUploadFormProps {
   onSuccess: () => void;
@@ -57,8 +57,7 @@ export function StudyMaterialUploadForm({ onSuccess, onError }: StudyMaterialUpl
 
   const isFormValid =
     isContextComplete &&
-    title.trim() &&
-    (files.length > 0 || referenceLinks.length > 0);
+    title.trim() !== "";
 
   const handleFileSelect = useCallback((selectedFiles: FileList | null) => {
     if (!selectedFiles) return;
@@ -103,7 +102,7 @@ export function StudyMaterialUploadForm({ onSuccess, onError }: StudyMaterialUpl
   };
 
   const handlePublish = async () => {
-    const draft: StudyMaterialDraft = {
+    const result = await uploadMaterial({
       academicContext: {
         subjectId: isPublic ? undefined : subjectId,
         batchId: isPublic ? undefined : batchId,
@@ -113,9 +112,7 @@ export function StudyMaterialUploadForm({ onSuccess, onError }: StudyMaterialUpl
       staffMessage,
       referenceLinks,
       files,
-    };
-
-    const result = await uploadMaterial(draft);
+    });
 
     if (result.success) {
       resetForm();

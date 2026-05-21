@@ -5,6 +5,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface StaffTimetableHeaderProps {
   selectedClass: ClassYear;
+  availableClasses: ClassYear[];
   onClassChange: (classYear: ClassYear) => void;
   isHod: boolean;
   isEditMode: boolean;
@@ -14,10 +15,9 @@ interface StaffTimetableHeaderProps {
   hasChanges: boolean;
 }
 
-const classYears: ClassYear[] = ["F.E.", "S.E.", "T.E.", "B.E."];
-
 export function StaffTimetableHeader({
   selectedClass,
+  availableClasses,
   onClassChange,
   isHod,
   isEditMode,
@@ -88,7 +88,7 @@ export function StaffTimetableHeader({
 
       <Tabs value={selectedClass} onValueChange={(v) => onClassChange(v as ClassYear)}>
         <TabsList className="bg-muted/50 p-1">
-          {classYears.map((year) => (
+          {availableClasses.map((year) => (
             <TabsTrigger
               key={year}
               value={year}

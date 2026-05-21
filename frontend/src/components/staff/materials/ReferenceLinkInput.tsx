@@ -14,8 +14,9 @@ interface ReferenceLinkInputProps {
 
 function isValidUrl(string: string): boolean {
   try {
-    new URL(string);
-    return true;
+    const url = new URL(string);
+    // Ensure it's not just "https://test" but has a valid domain structure (e.g. includes a dot)
+    return url.hostname.includes('.');
   } catch {
     return false;
   }

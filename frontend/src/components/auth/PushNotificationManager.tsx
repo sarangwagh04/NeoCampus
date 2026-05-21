@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Bell } from 'lucide-react';
 import api from '@/api/axios';
 
-const VAPID_PUBLIC_KEY = "BDRrrZAbda9__yRjV7NV8_CcYMSKYGrbED7nkXc-pgY7A5Zdk1QGiGhFq-YvRcH6ZBvGxC8EJ1lzdO4GFE78qrU";
+const VAPID_PUBLIC_KEY = "BNwLT28jPSXFMdyiPX0vfjSTAq7mQfRTpa45-LWWayDtlzH8NOcOf5nAYk4uxv8vIQbEk4YWxQ_K4mHIAIu8Wjc";
 
 function urlBase64ToUint8Array(base64String: string) {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
@@ -67,7 +67,7 @@ export default function PushNotificationManager() {
   if (!showPrompt) return null;
 
   return (
-    <div className="fixed bottom-4 left-4 z-50 bg-primary text-primary-foreground p-3 rounded-xl shadow-xl flex items-center gap-3">
+    <div className="fixed bottom-4 right-4 z-[9999] bg-primary text-primary-foreground p-3 rounded-xl shadow-xl flex items-center gap-3">
       <Bell className="w-5 h-5" />
       <span className="text-sm font-medium">Enable Notice Alerts</span>
       <button 

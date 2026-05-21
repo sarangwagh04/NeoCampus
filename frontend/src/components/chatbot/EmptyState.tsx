@@ -8,20 +8,19 @@ interface EmptyStateProps {
 }
 
 const exampleQuestions: Record<string, string[]> = {
-  "Others": [
-    "Explain the difference between stack and queue",
-    "What is a binary search tree?",
-    "How does a hash table work?",
+  "Other": [
+    "Write C code to print Hello, World!",
+    "Explain the fundamentals of OOP",
+    "What is the difference between HTTP and HTTPS?",
   ],
   "DBMS": [
-    "What is normalization in databases?",
+    "Tell COURSE OUTCOME",
     "Explain ACID properties",
     "What are different types of SQL joins?",
   ],
-  "Operating Systems": [
-    "What is process scheduling?",
-    "Explain deadlock and its prevention",
-    "What is virtual memory?",
+  "College Updates": [
+    "Tell Me In Detail about COGNOTSAV-2K26 Event",
+    "Tell me About the AURA 1.0 Event",
   ],
   "Computer Networks": [
     "Explain the OSI model layers",
@@ -29,9 +28,9 @@ const exampleQuestions: Record<string, string[]> = {
     "How does DNS work?",
   ],
   default: [
-    "What are the key concepts in this subject?",
-    "Explain the fundamentals",
-    "What are common applications?",
+    "Write C code to print Hello, World!",
+    "Explain the fundamentals of OOP",
+    "What is the difference between HTTP and HTTPS?",
   ],
 };
 
