@@ -1,9 +1,9 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { StaffDashboardLayout } from "@/components/staff/StaffDashboardLayout";
 import { StaffTimetableHeader } from "@/components/staff/timetable/StaffTimetableHeader";
 import { StaffWeeklyTimetable } from "@/components/staff/timetable/StaffWeeklyTimetable";
-import { useStaffTimetableData, ClassYear } from "@/hooks/useStaffTimetableData";
-import { TimetableData, LectureSlot } from "@/hooks/useTimetableData";
+import { useStaffTimetableData, type ClassYear } from "@/hooks/useStaffTimetableData";
+import type { TimetableData, LectureSlot } from "@/hooks/useTimetableData";
 import { AlertCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -31,11 +31,17 @@ export default function StaffTimetable() {
   });
   const [hasChanges, setHasChanges] = useState(false);
 
-  const { timetables, isLoading, error, isHod, getSubjectsForClass } = useStaffTimetableData();
+  const { timetables, availableClasses, isLoading, error, isHod, getSubjectsForClass } = useStaffTimetableData();
+
+  useEffect(() => {
+    if (availableClasses.length > 0 && !availableClasses.includes(selectedClass)) {
+      setSelectedClass(availableClasses[0]);
+    }
+  }, [availableClasses, selectedClass]);
   const { toast } = useToast();
 
-  const currentTimetable = isEditMode && editedTimetables[selectedClass] 
-    ? editedTimetables[selectedClass] 
+  const currentTimetable = isEditMode && editedTimetables[selectedClass]
+    ? editedTimetables[selectedClass]
     : timetables[selectedClass];
 
   const subjects = getSubjectsForClass(selectedClass);
@@ -55,7 +61,7 @@ export default function StaffTimetable() {
       if (!currentClassTimetable) return prev;
 
       const updatedSchedule = { ...currentClassTimetable.schedule };
-      
+
       if (!updatedSchedule[day]) {
         updatedSchedule[day] = {};
       }
@@ -96,32 +102,32 @@ export default function StaffTimetable() {
 
   const handleConfirmSave = useCallback(async () => {
 
-  try {
+    try {
 
-    const timetableToSave = editedTimetables[selectedClass];
+      const timetableToSave = editedTimetables[selectedClass];
 
-    await api.put(`/staff-timetable/${selectedClass}/`, {
-      schedule: timetableToSave?.schedule,
-    });
+      await api.put(`/staff-timetable/${selectedClass}/`, {
+        schedule: timetableToSave?.schedule,
+      });
 
-    toast({
-      title: "Timetable Updated",
-      description: "Timetable updated successfully.",
-    });
+      toast({
+        title: "Timetable Updated",
+        description: "Timetable updated successfully.",
+      });
 
-    setIsEditMode(false);
-    setHasChanges(false);
-    setShowSaveDialog(false);
+      setIsEditMode(false);
+      setHasChanges(false);
+      setShowSaveDialog(false);
 
-  } catch (error) {
-    toast({
-      title: "Error",
-      description: "Failed to update timetable.",
-      variant: "destructive",
-    });
-  }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update timetable.",
+        variant: "destructive",
+      });
+    }
 
-}, [toast, editedTimetables, selectedClass]);
+  }, [toast, editedTimetables, selectedClass]);
 
   const handleCancel = useCallback(() => {
     setIsEditMode(false);
@@ -138,6 +144,7 @@ export default function StaffTimetable() {
     <StaffDashboardLayout>
       <StaffTimetableHeader
         selectedClass={selectedClass}
+        availableClasses={availableClasses}
         onClassChange={setSelectedClass}
         isHod={isHod}
         isEditMode={isEditMode}
@@ -173,7 +180,7 @@ export default function StaffTimetable() {
           <AlertDialogHeader>
             <AlertDialogTitle>Save Timetable Changes</AlertDialogTitle>
             <AlertDialogDescription>
-              Once saved, the updated timetable will be visible to all students immediately. 
+              Once saved, the updated timetable will be visible to all students immediately.
               Are you sure you want to proceed?
             </AlertDialogDescription>
           </AlertDialogHeader>
