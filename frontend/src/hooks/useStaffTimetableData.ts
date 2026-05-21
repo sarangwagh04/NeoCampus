@@ -6,6 +6,7 @@ export type ClassYear = "F.E." | "S.E." | "T.E." | "B.E.";
 
 export interface StaffTimetableState {
   timetables: Record<ClassYear, TimetableData | null>;
+  availableClasses: ClassYear[];
   subjects: SubjectOption[];
   isLoading: boolean;
   error: string | null;
@@ -19,12 +20,6 @@ export interface SubjectOption {
   classroom: string;
 }
 
-/* ❌ REMOVED ALL MOCK DATA:
-   - mockTimeSlots
-   - subjectsByClass
-   - createLecture
-   - generateSchedule
-*/
 
 export function useStaffTimetableData() {
   const [state, setState] = useState<StaffTimetableState>({
@@ -34,6 +29,7 @@ export function useStaffTimetableData() {
       "T.E.": null,
       "B.E.": null,
     },
+    availableClasses: [],
     subjects: [],
     isLoading: true,
     error: null,
@@ -100,8 +96,11 @@ export function useStaffTimetableData() {
           });
         });
 
+        const availableClasses = Object.keys(backendData) as ClassYear[];
+
         setState({
           timetables: formattedTimetables,
+          availableClasses,
           subjects: subjectList,
           isLoading: false,
           error: null,

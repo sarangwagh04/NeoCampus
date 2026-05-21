@@ -66,12 +66,7 @@ export function useTimetableData() {
         // ✅ Fetch both APIs in parallel (FASTER)
         const [timetableResponse, teachingPlanResponse] =
           await Promise.all([
-            api.get("/timetable/", {
-              params: {
-                branch: "CSD", // 🔹 later dynamic
-                year: "BE",
-              },
-            }),
+            api.get("/timetable/"),
             api.get("/student-teaching-plan/"),
           ]);
 
