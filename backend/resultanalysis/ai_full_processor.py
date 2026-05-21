@@ -27,7 +27,7 @@ if not GEMINI_API_KEY:
     raise RuntimeError("GEMINI_API_KEY not configured")
 
 genai.configure(api_key=GEMINI_API_KEY)
-print("API KEY BEING USED:", GEMINI_API_KEY)
+print("For Result Analysis API KEY BEING USED:", GEMINI_API_KEY)
 
 MODEL = genai.GenerativeModel("gemini-2.5-flash")
 
