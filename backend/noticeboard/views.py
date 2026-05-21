@@ -9,7 +9,7 @@ from .models import Notice, PushSubscription
 from .serializers import NoticeSerializer
 from timetables.models import Subject
 from profiles.models import StaffProfile, StudentProfile
-from .utils import send_push_notification
+from .utils import send_push_notifications_async
 from rest_framework import serializers
 from django.db.models import Q
 
@@ -99,15 +99,16 @@ class NoticeListCreateView(generics.ListCreateAPIView):
             }
             if is_public:
                 # Send to all users except the staff who created it (optional optimization)
+                print(f"[Notice Create] Fetching public subscriptions...")
                 subs = PushSubscription.objects.exclude(user=self.request.user)
             else:
+                print(f"[Notice Create] Fetching subscriptions for batch {batch_id}...")
                 student_user_ids = StudentProfile.objects.filter(batch_id=batch_id).values_list('user_id', flat=True)
                 subs = PushSubscription.objects.filter(user_id__in=student_user_ids)
                 
-            for sub in subs:
-                send_push_notification(sub, payload)
+            send_push_notifications_async(subs, payload)
         except Exception as e:
-            print(f"Failed to queue push notifications: {str(e)}")
+            print(f"[Push Error] Failed to queue push notifications: {str(e)}")
 
 
 # =====================================================

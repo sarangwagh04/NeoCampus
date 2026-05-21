@@ -1,6 +1,9 @@
 # profiles/models.py
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.core.exceptions import ObjectDoesNotExist
 
 # -------------------- COMMON --------------------
 GENDER_CHOICES = [
@@ -100,4 +103,32 @@ class StaffProfile(models.Model):
         verbose_name = "Staff Profile"
         verbose_name_plural = "Staff Profiles"
 
+# -------------------- SIGNALS --------------------
+@receiver(post_save, sender=StudentProfile)
+@receiver(post_save, sender=StaffProfile)
+def sync_profile_to_user(sender, instance, **kwargs):
+    if instance.user:
+        if instance.user.first_name != instance.first_name or instance.user.last_name != instance.last_name:
+            instance.user.first_name = instance.first_name
+            instance.user.last_name = instance.last_name
+            instance.user.save(update_fields=['first_name', 'last_name'])
 
+@receiver(post_save, sender=User)
+def sync_user_to_profile(sender, instance, **kwargs):
+    try:
+        profile = instance.student_profile
+        if profile.first_name != instance.first_name or profile.last_name != instance.last_name:
+            profile.first_name = instance.first_name
+            profile.last_name = instance.last_name
+            profile.save(update_fields=['first_name', 'last_name'])
+    except ObjectDoesNotExist:
+        pass
+
+    try:
+        profile = instance.staff_profile
+        if profile.first_name != instance.first_name or profile.last_name != instance.last_name:
+            profile.first_name = instance.first_name
+            profile.last_name = instance.last_name
+            profile.save(update_fields=['first_name', 'last_name'])
+    except ObjectDoesNotExist:
+        pass

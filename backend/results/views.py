@@ -116,15 +116,15 @@ class ResultUploadCreateView(APIView):
                 percentage = (total_obt / total_total) * 100
                 total_percentage_list.append(percentage)
 
-                if percentage >= 95:
+                if percentage >= 90:
                     grade = "A+"
                 elif percentage >= 85:
                     grade = "A"
-                elif percentage >= 75:
+                elif percentage >= 70:
                     grade = "B"
-                elif percentage >= 65:
-                    grade = "C"
                 elif percentage >= 55:
+                    grade = "C"
+                elif percentage >= 40:
                     grade = "P"
                 else:
                     grade = "F"

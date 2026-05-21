@@ -1,8 +1,14 @@
 import google.generativeai as genai
 from django.conf import settings
 import os
+from dotenv import load_dotenv
 
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+# Load environment variables from backend/.env
+env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env")
+load_dotenv(dotenv_path=env_path)
+
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
 
 if not GEMINI_API_KEY:
     raise RuntimeError(
@@ -10,7 +16,7 @@ if not GEMINI_API_KEY:
     )
 
 genai.configure(api_key=GEMINI_API_KEY)
-
+print("For Chatbot API KEY BEING USED:", GEMINI_API_KEY)
 
 def generate_answer(question: str, chunks: list[str], mode: str = "academic") -> str:
     """
@@ -21,7 +27,7 @@ def generate_answer(question: str, chunks: list[str], mode: str = "academic") ->
 
     context = "\n\n".join(chunks)
 
-    # ===================== NEW SECTION =====================
+    # ========================================================
     # Separate prompt for College Updates
     # ========================================================
 

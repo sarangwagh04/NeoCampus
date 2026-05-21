@@ -13,7 +13,7 @@ from attendance.models import (
     TeachingPlan,
     Attendance
 )
-from profiles.models import StudentProfile
+from profiles.models import StudentProfile, StaffProfile
 
 
 
@@ -25,15 +25,6 @@ class TimetableView(APIView):
 
     def get(self, request):
 
-        branch = request.query_params.get("branch")
-        year = request.query_params.get("year")
-
-        if not branch or not year:
-            return Response(
-                {"error": "branch and year are required parameters."},
-                status=400
-            )
-
         # ===============================
         # 🔹 Get Student Profile
         # ===============================
@@ -41,6 +32,20 @@ class TimetableView(APIView):
             StudentProfile,
             user=request.user
         )
+
+        branch = student.branch
+        sem = str(student.semester)
+
+        if sem in ["1", "2"]:
+            year = "FE"
+        elif sem in ["3", "4"]:
+            year = "SE"
+        elif sem in ["5", "6"]:
+            year = "TE"
+        elif sem in ["7", "8"]:
+            year = "BE"
+        else:
+            year = "FE"
 
         batch_id = student.batch_id
         semester = student.semester
@@ -275,6 +280,9 @@ class StaffTimetableView(APIView):
 
     def get(self, request):
 
+        # 🔹 Get Staff Profile to determine branch
+        staff = get_object_or_404(StaffProfile, user=request.user)
+
         # ==========================================
         # 🔹 Fetch all subjects (no filtering yet)
         # ==========================================
@@ -286,12 +294,16 @@ class StaffTimetableView(APIView):
 
         response_data = {}
 
-        YEAR_MAP = {
-            "FE": "F.E.",
-            "SE": "S.E.",
-            "TE": "T.E.",
-            "BE": "B.E.",
-        }
+        if staff.branch == "FYE":
+            YEAR_MAP = {
+                "FE": "F.E.",
+            }
+        else:
+            YEAR_MAP = {
+                "SE": "S.E.",
+                "TE": "T.E.",
+                "BE": "B.E.",
+            }
 
         for year_code, frontend_year in YEAR_MAP.items():
 

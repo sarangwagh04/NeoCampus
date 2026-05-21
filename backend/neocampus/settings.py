@@ -33,7 +33,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config("SECRET_KEY")
 
 VAPID_PUBLIC_KEY = config("VAPID_PUBLIC_KEY", default="")
-VAPID_PRIVATE_KEY = config("VAPID_PRIVATE_KEY", default="")
+
+# Ensure VAPID_PRIVATE_KEY is an absolute path if it points to a .pem file
+_vapid_priv = config("VAPID_PRIVATE_KEY", default="")
+if _vapid_priv.endswith(".pem"):
+    VAPID_PRIVATE_KEY = str(BASE_DIR / _vapid_priv)
+else:
+    VAPID_PRIVATE_KEY = _vapid_priv
+
 VAPID_ADMIN_EMAIL = config("VAPID_ADMIN_EMAIL", default="sarangwagh54321@gmail.com")
 
 # SECURITY WARNING: don't run with debug turned on in production!
