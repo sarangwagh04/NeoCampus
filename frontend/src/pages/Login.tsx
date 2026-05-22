@@ -218,21 +218,21 @@ const Login = () => {
                   <span className="w-full text-center text-xs text-muted-foreground mb-1">Quick Demo Login</span>
                   <button
                     type="button"
-                    onClick={() => { setUsername("rushi"); setPassword("Pass@123"); }}
+                    onClick={() => { setUsername("CSD2022054"); setPassword("Sara0402"); }}
                     className="px-3 py-1.5 text-xs font-medium rounded-full bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20 transition-all"
                   >
                     Student
                   </button>
                   <button
                     type="button"
-                    onClick={() => { setUsername("sarang"); setPassword("sarang"); }}
+                    onClick={() => { setUsername("CSDPRF001"); setPassword("Pass@123"); }}
                     className="px-3 py-1.5 text-xs font-medium rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/20 transition-all"
                   >
                     Staff
                   </button>
                   <button
                     type="button"
-                    onClick={() => { setUsername("Tambe"); setPassword("Pass@123"); }}
+                    onClick={() => { setUsername("CSDHOD001"); setPassword("Pass@123"); }}
                     className="px-3 py-1.5 text-xs font-medium rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 border border-amber-500/20 transition-all"
                   >
                     HOD

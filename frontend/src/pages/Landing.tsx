@@ -12,7 +12,7 @@ import SplashCursor from "@/components/landing/SplashCursor";
 import { AuroraBackground } from "@/components/landing/aurora-background";
 
 const Landing = () => {
-  const [splashCursorEnabled, setSplashCursorEnabled] = useState(true);
+  const [splashCursorEnabled, setSplashCursorEnabled] = useState(false);
 
 useEffect(() => {
   const existingToken = localStorage.getItem("access_token");
