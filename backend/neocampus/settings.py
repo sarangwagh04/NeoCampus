@@ -30,7 +30,7 @@ import dj_database_url
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = config("SECRET_KEY")
+SECRET_KEY = config("SECRET_KEY", default="django-insecure-fallback-key-for-build")
 
 VAPID_PUBLIC_KEY = config("VAPID_PUBLIC_KEY", default="")
 
@@ -112,20 +112,14 @@ TEMPLATES = [
 WSGI_APPLICATION = 'neocampus.wsgi.application'
 
 
+# Use dj_database_url for deployment, fallback to sqlite if DATABASE_URL is missing
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": config("DB_NAME"),
-        "USER": config("DB_USER"),
-        "PASSWORD": config("DB_PASSWORD"),
-        "HOST": config("DB_HOST"),
-        "PORT": config("DB_PORT", cast=int),
-    }
-} #for local system
-
-# DATABASES = {
-#     "default": dj_database_url.config(default=os.environ.get("DATABASE_URL"))
-# } #for deployment
+    "default": dj_database_url.config(
+        default=config("DATABASE_URL", default="sqlite:///db.sqlite3"),
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
+}
 
 
 AUTH_PASSWORD_VALIDATORS = [
