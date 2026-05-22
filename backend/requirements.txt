@@ -1,5 +1,5 @@
 # Core Web
-Django==5.2.7
+Django==6.0.1
 djangorestframework
 djangorestframework-simplejwt
 django-cors-headers
