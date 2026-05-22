@@ -248,7 +248,7 @@ const Login = () => {
                 transition={{ delay: 0.7 }}
               >
                 <p className="text-xs text-muted-foreground text-center leading-relaxed">
-                  <span className="font-semibold text-foreground/80">Admin?</span> Use <a href="http://127.0.0.1:8000/admin/" className="text-primary hover:underline font-medium">admin portal</a> for administrative access.
+                  <span className="font-semibold text-foreground/80">Admin?</span> Use <a href="https://neocampus-wylk.onrender.com/admin/" className="text-primary hover:underline font-medium">admin portal</a> for administrative access.
                 </p>
               </motion.div>
             </CardContent>

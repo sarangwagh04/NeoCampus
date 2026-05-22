@@ -65,7 +65,7 @@ export function useStaffProfile() {
           mobileNumber: data.mobile_number,
           address: data.address,
           profilePicture: data.profile_picture
-            ? `http://127.0.0.1:8000${data.profile_picture}`
+            ? `https://neocampus-wylk.onrender.com${data.profile_picture}`
             : "",
 
           branch: data.branch,

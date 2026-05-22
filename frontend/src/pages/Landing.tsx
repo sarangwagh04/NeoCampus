@@ -21,7 +21,7 @@ useEffect(() => {
     const initAuthCheck = async () => {
       try {
         // 1. Wake up the listener because we are on the landing page
-        await fetch("http://127.0.0.1:8000/api/home/hardware-listener-state/", {
+        await fetch("https://neocampus-wylk.onrender.com/api/home/hardware-listener-state/", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ active: true })
@@ -35,7 +35,7 @@ useEffect(() => {
     const interval = setInterval(async () => {
       try {
         const res = await fetch(
-          "http://127.0.0.1:8000/api/home/hardware-auth-status/"
+          "https://neocampus-wylk.onrender.com/api/home/hardware-auth-status/"
         );
       const data = await res.json();
 
@@ -56,7 +56,7 @@ useEffect(() => {
         );
 
         await fetch(
-          "http://127.0.0.1:8000/api/home/delete-hardware-auth/"
+          "https://neocampus-wylk.onrender.com/api/home/delete-hardware-auth/"
         );
 
         clearInterval(interval);

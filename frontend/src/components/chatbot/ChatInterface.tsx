@@ -122,7 +122,7 @@ export function ChatInterface({ variant = "dashboard" }: ChatInterfaceProps) {
       ------------------------------------------ */
       if (selectedSubject.id === "add-updates") {
         const response = await fetch(
-          "http://127.0.0.1:8000/api/chatbot/post-update/",
+          "https://neocampus-wylk.onrender.com/api/chatbot/post-update/",
           {
             method: "POST",
             headers: {
@@ -157,7 +157,7 @@ export function ChatInterface({ variant = "dashboard" }: ChatInterfaceProps) {
       ------------------------------------------ */
 
       const response = await fetch(
-        "http://127.0.0.1:8000/api/chatbot/ask/",
+        "https://neocampus-wylk.onrender.com/api/chatbot/ask/",
         {
           method: "POST",
           headers: {

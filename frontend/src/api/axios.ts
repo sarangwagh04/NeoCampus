@@ -5,7 +5,7 @@ import axios, {
 } from "axios";
 
 const api: AxiosInstance = axios.create({
-  baseURL: "http://127.0.0.1:8000/api",
+  baseURL: "https://neocampus-wylk.onrender.com/api",
 });
 
 // 🔐 Attach Access Token
@@ -43,7 +43,7 @@ api.interceptors.response.use(
         }
 
         const res = await axios.post(
-          "http://127.0.0.1:8000/api/token/refresh/",
+          "https://neocampus-wylk.onrender.com/api/token/refresh/",
           { refresh: refreshToken }
         );
 
