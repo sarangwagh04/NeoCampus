@@ -64,3 +64,4 @@ dist-ssr
 
 # Uploaded Data
 media/
+staticfiles/
