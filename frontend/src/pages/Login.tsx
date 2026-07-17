@@ -209,7 +209,7 @@ const Login = () => {
                 </motion.div>
 
                 {/* Quick Login Buttons */}
-                <motion.div
+                {/* <motion.div
                   className="flex flex-wrap gap-2 justify-center pt-2"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -237,7 +237,7 @@ const Login = () => {
                   >
                     HOD
                   </button>
-                </motion.div>
+                </motion.div> */}
               </form>
 
               {/* Admin Note */}
