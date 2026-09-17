@@ -44,7 +44,7 @@ ALLOWED_HOSTS = ["*"]
 
 
 INTERNAL_IPS = [
-    "127.0.0.1","localhost",
+    "127.0.0.1", "localhost",
 ] # For Django Debug Toolbar - Sarang
 
 
@@ -69,14 +69,14 @@ INSTALLED_APPS = [
     "chatbot.apps.ChatbotConfig", #chatbot app config to register signals -sarang
     "rest_framework", #-ReaactJS
     "corsheaders", #-ReaactJS
-    "debug_toolbar", # Django Debug Toolbar for API Trakcing - Sarang
+    # "debug_toolbar", # Temporary Debug Toolbar for API Tracking - commented out
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     "corsheaders.middleware.CorsMiddleware", #-ReaactJS
-    "debug_toolbar.middleware.DebugToolbarMiddleware", # Django Debug Toolbar for API Trakcing - Sarang
+    # "debug_toolbar.middleware.DebugToolbarMiddleware", # Temporary Debug Toolbar for API Tracking - commented out
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',

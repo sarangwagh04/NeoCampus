@@ -47,8 +47,8 @@ urlpatterns = [
 
 
 
-    # Django Debug Toolbar URLs - Sarang
-    path("__debug__/", include("debug_toolbar.urls")), 
+    # Django Debug Toolbar URLs - Sarang (Temporary - commented out)
+    # path("__debug__/", include("debug_toolbar.urls")), 
 ]
 
 
