@@ -53,14 +53,14 @@ export function ChatInterface({ variant = "dashboard" }: ChatInterfaceProps) {
 
   const subjects: Subject[] = isStaff
     ? [
-        ...baseSubjects,
-        {
-          id: "add-updates",
-          name: "Post Updates",
-          code: "STAFF",
-          chunksAvailable: false,
-        },
-      ]
+      ...baseSubjects,
+      {
+        id: "add-updates",
+        name: "Post Updates",
+        code: "STAFF",
+        chunksAvailable: false,
+      },
+    ]
     : baseSubjects;
 
   /* ----------------------------
@@ -153,9 +153,64 @@ export function ChatInterface({ variant = "dashboard" }: ChatInterfaceProps) {
       }
 
       /* -----------------------------------------
-         ✅ NORMAL CHAT (Other / DBMS / Updates)
+         ✅ RAG CHAT (DBMS / College Updates)
+         Temporarily disabled in production
       ------------------------------------------ */
+      if (selectedSubject.id !== "other") {
+        /* 
+        // Original RAG Fetch (commented out for production):
+        const response = await fetch(
+          "http://127.0.0.1:8000/api/chatbot/ask/",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              question: content,
+              context:
+                selectedSubject.id === "dbms"
+                  ? "DBMS"
+                  : selectedSubject.id === "updates"
+                  ? "COLLEGE_UPDATE"
+                  : "",
+              top_k: 3,
+            }),
+          }
+        );
 
+        if (!response.ok) {
+          throw new Error("API failed");
+        }
+
+        const data = await response.json();
+
+        const assistantMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          role: "assistant",
+          content: data.answer,
+          timestamp: new Date(),
+        };
+        */
+
+        const assistantMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          role: "assistant",
+          content: "This feature is disabled in production due to limited resources...\nPlease use your 'Other' mode chatbot for assistance. or setup locally",
+          timestamp: new Date(),
+        };
+
+        setMessages((prev) =>
+          prev.filter((m) => m.id !== "loading").concat(assistantMessage)
+        );
+
+        setIsLoading(false);
+        return;
+      }
+
+      /* -----------------------------------------
+         ✅ NORMAL CHAT (Other mode - Non-RAG)
+      ------------------------------------------ */
       const response = await fetch(
         "http://127.0.0.1:8000/api/chatbot/ask/",
         {
@@ -165,12 +220,7 @@ export function ChatInterface({ variant = "dashboard" }: ChatInterfaceProps) {
           },
           body: JSON.stringify({
             question: content,
-            context:
-              selectedSubject.id === "dbms"
-                ? "DBMS"
-                : selectedSubject.id === "updates"
-                ? "COLLEGE_UPDATE"
-                : "",
+            context: "",
             top_k: 3,
           }),
         }
