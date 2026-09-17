@@ -1,4 +1,4 @@
-import google.generativeai as genai
+from google import genai
 from django.conf import settings
 import os
 
@@ -9,7 +9,7 @@ if not GEMINI_API_KEY:
         "API Failed, Contact Admin"
     )
 
-genai.configure(api_key=GEMINI_API_KEY)
+client = genai.Client(api_key=GEMINI_API_KEY)
 
 
 def generate_answer(question: str, chunks: list[str], mode: str = "academic") -> str:
@@ -70,7 +70,9 @@ Question:
 Answer:
 """
 
-    model = genai.GenerativeModel("gemini-2.5-flash")
-    response = model.generate_content(prompt)
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=prompt,
+    )
 
-    return response.text.strip()
+    return (response.text or "").strip()

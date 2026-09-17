@@ -4,7 +4,7 @@ from io import BytesIO
 from pdf2image import convert_from_bytes
 from PIL import Image
 
-import google.generativeai as genai
+from google import genai
 
 # ============================================
 # CONFIG
@@ -20,9 +20,7 @@ GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 if not GEMINI_API_KEY:
     raise RuntimeError("GEMINI_API_KEY not configured")
 
-genai.configure(api_key=GEMINI_API_KEY)
-
-MODEL = genai.GenerativeModel("gemini-2.5-flash")
+client = genai.Client(api_key=GEMINI_API_KEY)
 
 
 # ============================================
@@ -114,9 +112,12 @@ def extract_csv_from_image(image_bytes: BytesIO, page_number, column_names):
 
     pil_image = Image.open(image_bytes)
 
-    response = MODEL.generate_content([prompt, pil_image])
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=[prompt, pil_image],
+    )
 
-    csv_text = response.text.strip()
+    csv_text = (response.text or "").strip()
 
     # remove markdown if Gemini adds
     if "```" in csv_text:

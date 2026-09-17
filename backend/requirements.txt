@@ -1,4 +1,4 @@
-﻿acres==0.5.0
+acres==0.5.0
 aiohappyeyeballs==2.6.1
 aiohttp==3.13.5
 aiosignal==1.4.0
@@ -34,7 +34,7 @@ google-api-core==2.29.0
 google-api-python-client==2.189.0
 google-auth==2.49.0.dev0
 google-auth-httplib2==0.3.0
-google-generativeai==0.8.6
+google-genai>=2.0.0
 googleapis-common-protos==1.72.0
 grpcio==1.78.0
 grpcio-status==1.71.2

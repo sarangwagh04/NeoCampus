@@ -4,7 +4,7 @@ from io import BytesIO, StringIO
 from pdf2image import convert_from_bytes
 from PIL import Image
 from openpyxl import Workbook
-import google.generativeai as genai
+from google import genai
 
 
 POPLER_PATH = r"C:\poppler-25.12.0\Library\bin"
@@ -36,10 +36,9 @@ def pdf_first_page_to_image(pdf_bytes: bytes):
 
 
 def extract_csv_from_image(image_bytes: BytesIO):
-    genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel("gemini-2.5-flash")
+    client = genai.Client(api_key=GEMINI_API_KEY)
 
-    prompt = prompt = """
+    prompt = """
 You are an academic result data extractor.
 
 Extract all tabular data from the image and return ONLY CSV format.
@@ -66,8 +65,11 @@ Return ONLY CSV.
     image_bytes.seek(0)
     pil_image = Image.open(image_bytes)
 
-    response = model.generate_content([prompt, pil_image])
-    csv_text = response.text.strip()
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=[prompt, pil_image],
+    )
+    csv_text = (response.text or "").strip()
 
     if csv_text.startswith("```"):
         csv_text = csv_text.split("```")[1]
