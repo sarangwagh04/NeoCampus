@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { SubjectResult } from "@/hooks/useStudentResults";
+import { type SubjectResult } from "@/hooks/useStudentResults";
 
 interface MarksheetData {
   studentName: string;

@@ -21,10 +21,10 @@ import { Label } from "@/components/ui/label";
 import { InlineBanner } from "@/components/ui/inline-banner";
 import { BarChart3, Edit2, Save, Users } from "lucide-react";
 import {
-  Student,
-  TeachingPlanLecture,
-  AttendanceRecord,
-  LectureAttendance,
+  type Student,
+  type TeachingPlanLecture,
+  type AttendanceRecord,
+  type LectureAttendance,
 } from "@/hooks/useStaffAttendanceData";
 import api from "@/api/axios";
 

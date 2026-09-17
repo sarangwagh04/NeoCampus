@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { TimetableData, LectureSlot, TimeSlot } from "@/hooks/useTimetableData";
+import { type TimetableData, type LectureSlot, type TimeSlot } from "@/hooks/useTimetableData";
 import { Clock, MapPin, User } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 

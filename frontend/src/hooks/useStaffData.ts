@@ -51,6 +51,18 @@ export interface StaffAnnouncement {
   isRead: boolean;
 }
 
+export interface RecentMaterial {
+  id: string;
+  title: string;
+  subjectName: string;
+  subjectCode: string;
+  targetClass: string;
+  uploadedAt: string;
+  filesCount: number;
+  status: "published" | "draft";
+  [key: string]: any;
+}
+
 export interface StaffData {
   profile: StaffProfile;
   stats: StaffStat[];
@@ -58,6 +70,7 @@ export interface StaffData {
   todaySchedule: TodayClass[];
   recentMaterials: RecentMaterial[];
   announcements: StaffAnnouncement[];
+  classPerformance?: ClassPerformance[] | null;
 }
 
 export function useStaffData() {

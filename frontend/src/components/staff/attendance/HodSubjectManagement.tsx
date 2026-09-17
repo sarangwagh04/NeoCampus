@@ -29,8 +29,8 @@ import {
   UserPlus,
 } from "lucide-react";
 import {
-  Subject,
-  SubjectAssignment,
+  type Subject,
+  type SubjectAssignment,
   useStaffList,
   useBatchList,
   useSubjectList,

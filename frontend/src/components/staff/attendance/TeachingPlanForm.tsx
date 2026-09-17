@@ -14,7 +14,7 @@ import {
 import { InlineBanner } from "@/components/ui/inline-banner";
 import { ArrowLeft, Plus, Save, Calendar, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
-import { AssignedSubject, TeachingPlanLecture } from "@/hooks/useStaffAttendanceData";
+import { type AssignedSubject, type TeachingPlanLecture } from "@/hooks/useStaffAttendanceData";
 import { useEffect } from "react";
 
 

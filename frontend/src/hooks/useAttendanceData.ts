@@ -8,7 +8,7 @@ interface AttendanceData {
 }
 
 // Simulated API call - replace with actual API endpoint
-async function fetchAttendanceData(semester: string): Promise<AttendanceData> {
+async function fetchAttendanceData(_semester: string): Promise<AttendanceData> {
   const res = await api.get("/attendance/student/overall/");
   
   return {

@@ -1,9 +1,9 @@
-import { User, Building2, Briefcase, ChevronRight } from "lucide-react";
+import { Building2, Briefcase, ChevronRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { StaffProfile } from "@/hooks/useStaffData";
+import { type StaffProfile } from "@/hooks/useStaffData";
 import { Link } from "react-router-dom";
 
 interface StaffProfileCardProps {

@@ -31,7 +31,7 @@ export function ZenLineDrawing({ onClose }: ZenLineDrawingProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [lines, setLines] = useState<Line[]>([]);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [currentColor, setCurrentColor] = useState(COLORS[0]);
+  const [_currentColor, setCurrentColor] = useState(COLORS[0]);
   const currentLineIdRef = useRef<number | null>(null);
 
   const getRandomColor = () => COLORS[Math.floor(Math.random() * COLORS.length)];

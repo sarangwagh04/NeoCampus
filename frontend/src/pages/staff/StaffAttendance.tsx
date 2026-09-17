@@ -16,7 +16,6 @@ export default function StaffAttendance() {
   const {
     subjects,
     assignments,
-    isLoading: dataLoading,
     createSubject,
     toggleSubjectStatus,
     deleteSubject,

@@ -18,7 +18,7 @@ interface RecentMaterial {
 
 export function RecentMaterials() {
   const [recentMaterials, setRecentMaterials] = useState<RecentMaterial[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
 
   // ✅ ADDED: Fetch from backend
   useEffect(() => {

@@ -283,7 +283,7 @@ export function useAIResultAnalysis() {
 
   const [step, setStep] = useState<AIStep>("upload");
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const [columnNames, setColumnNames] = useState<string>("");
+  const [_columnNames, setColumnNames] = useState<string>("");
 
   const [parsedData, setParsedData] = useState<ParsedData | null>(null);
   const [selectedColumn, setSelectedColumn] = useState<string | null>(null);

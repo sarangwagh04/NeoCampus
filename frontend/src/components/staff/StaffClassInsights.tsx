@@ -2,8 +2,6 @@ import { TrendingUp, Users, BarChart } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ClassPerformance } from "@/hooks/useStaffResultUpload";
-import { cn } from "@/lib/utils";
 
 interface StaffClassInsightsProps {
   performance: ClassPerformance[] | null;
@@ -11,9 +9,11 @@ interface StaffClassInsightsProps {
 }
 
 export interface ClassPerformance {
-  batch: string;
+  batch?: string;
+  subject?: string;
   averageAttendance: number;
   averageScore: number;
+  submissionRate?: number;
 }
 
 function getColorClass(value: number) {

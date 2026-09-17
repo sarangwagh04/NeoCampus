@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { SubjectResult } from "@/hooks/useStudentResults";
+import { type SubjectResult } from "@/hooks/useStudentResults";
 import { Loader2 } from "lucide-react";
 
 interface SubjectResultsTableProps {

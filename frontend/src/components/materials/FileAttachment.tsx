@@ -1,6 +1,6 @@
 import { Download, FileText, FileSpreadsheet, File, FileArchive, Presentation } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { FileAttachment as FileAttachmentType } from "@/hooks/useStudyMaterials";
+import { type FileAttachment as FileAttachmentType } from "@/hooks/useStudyMaterials";
 
 interface FileAttachmentProps {
   file: FileAttachmentType;
@@ -25,8 +25,8 @@ const fileColors = {
 };
 
 export function FileAttachment({ file }: FileAttachmentProps) {
-  const Icon = fileIcons[file.type] || File;
-  const iconColor = fileColors[file.type] || "text-muted-foreground";
+  const Icon = (fileIcons as Record<string, any>)[file.type] || File;
+  const iconColor = (fileColors as Record<string, string>)[file.type] || "text-muted-foreground";
 
   const handleDownload = () => {
     // In production, this would trigger actual file download

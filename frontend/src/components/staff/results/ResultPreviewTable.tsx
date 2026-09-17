@@ -3,7 +3,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CheckCircle, Eye, Users, TrendingUp, TrendingDown, Award } from "lucide-react";
-import { StudentResult, ResultSummary } from "@/hooks/useStaffResultUpload";
+import { type StudentResult, type ResultSummary } from "@/hooks/useStaffResultUpload";
 import { cn } from "@/lib/utils";
 
 interface ResultPreviewTableProps {

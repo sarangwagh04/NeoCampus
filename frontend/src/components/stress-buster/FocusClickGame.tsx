@@ -23,7 +23,7 @@ export function FocusClickGame({ onClose }: FocusClickGameProps) {
   const [reactionTime, setReactionTime] = useState<number | null>(null);
   const [bestTime, setBestTime] = useState<number | null>(null);
   const colorChangeTimeRef = useRef<number>(0);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const getRandomColor = useCallback((excludeColor?: typeof COLORS[0]) => {
     const available = COLORS.filter(c => c.value !== excludeColor?.value);

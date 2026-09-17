@@ -53,9 +53,9 @@ export interface PerformanceTrend {
 
 /* -------------------- MOCK DATA (UNCHANGED) -------------------- */
 // const mockResults: SemesterResult[] = [ /* unchanged */];
-const mockBacklogs: Backlog[] = [
-  { subjectCode: "CS403", subjectName: "Computer Architecture", semester: 4, attemptCount: 1, status: "Pending" },
-];
+// const mockBacklogs: Backlog[] = [
+//   { subjectCode: "CS403", subjectName: "Computer Architecture", semester: 4, attemptCount: 1, status: "Pending" },
+// ];
 
 
 

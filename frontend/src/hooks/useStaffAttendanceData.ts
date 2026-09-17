@@ -70,7 +70,7 @@ export interface LectureAttendance {
 
 export interface StaffRole {
   isHod: boolean;
-  department: string;
+  department: string | null;
 }
 
 /* ======================================================
@@ -351,7 +351,7 @@ export function useTeachingPlan(assignmentId: string | undefined) {
   }, [assignmentId]);
 
   const createPlan = async (
-    totalLectures: number,
+    _totalLectures: number,
     lectures: Partial<TeachingPlanLecture>[]
   ) => {
     const payload = lectures.map((l, index) => ({
@@ -426,7 +426,7 @@ export function useAttendanceMarking(assignmentId: string | undefined) {
   const [students, setStudents] = useState<Student[]>([]);
   const [teachingPlan, setTeachingPlan] = useState<TeachingPlanLecture[]>([]);
   const [subject, setSubject] = useState<AssignedSubject | null>(null);
-  const [attendanceHistory, setAttendanceHistory] = useState<
+  const [attendanceHistory] = useState<
     Record<string, AttendanceRecord[]>
   >({});
   const [attendanceOverview, setAttendanceOverview] =

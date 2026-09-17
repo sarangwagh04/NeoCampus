@@ -7,7 +7,7 @@ import { GuardianInfoSection } from "@/components/profile/GuardianInfoSection";
 import { SystemInfoSection } from "@/components/profile/SystemInfoSection";
 import { Button } from "@/components/ui/button";
 import { InlineBanner } from "@/components/ui/inline-banner";
-import { useStudentProfile, EditableProfileFields } from "@/hooks/useStudentProfile";
+import { useStudentProfile, type EditableProfileFields } from "@/hooks/useStudentProfile";
 import { Edit3, Save, X, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -18,8 +18,6 @@ const StudentProfile = () => {
     isSaving,
     updateProfile,
     updateProfilePicture,
-    validateEmail,
-    validateMobile,
   } = useStudentProfile();
 
   const [isEditMode, setIsEditMode] = useState(false);

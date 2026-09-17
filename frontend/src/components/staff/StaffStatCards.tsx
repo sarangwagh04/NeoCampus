@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { StaffStat, TodayClass } from "@/hooks/useStaffData";
+import { type StaffStat, type TodayClass } from "@/hooks/useStaffData";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
 

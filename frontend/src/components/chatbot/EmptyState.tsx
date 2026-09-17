@@ -1,4 +1,4 @@
-import { MessageSquare, Lightbulb, Bot, Sparkles, BookOpen } from "lucide-react";
+import { Lightbulb, Bot, Sparkles, BookOpen } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface EmptyStateProps {

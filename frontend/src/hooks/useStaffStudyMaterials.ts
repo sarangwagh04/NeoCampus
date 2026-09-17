@@ -16,6 +16,17 @@ export interface Subject {
   code: string;
 }
 
+export interface UploadedMaterial {
+  id: number;
+  title: string;
+  subject_code?: string;
+  uploaded_by?: string;
+  created_at: string;
+  [key: string]: any;
+}
+
+export type StudyMaterialDraft = any;
+
 export function useStaffStudyMaterials() {
 
   const [assignedSubjects, setAssignedSubjects] = useState<Subject[]>([]);

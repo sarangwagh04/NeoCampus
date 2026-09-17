@@ -1,6 +1,6 @@
 import { AlertTriangle, CheckCircle, BookOpen } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Backlog } from "@/hooks/useStudentResults";
+import { type Backlog } from "@/hooks/useStudentResults";
 import { cn } from "@/lib/utils";
 
 interface BacklogsSectionProps {

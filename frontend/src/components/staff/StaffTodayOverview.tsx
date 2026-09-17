@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { TodayClass } from "@/hooks/useStaffData";
+import { type TodayClass } from "@/hooks/useStaffData";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
 interface StaffTodayOverviewProps {

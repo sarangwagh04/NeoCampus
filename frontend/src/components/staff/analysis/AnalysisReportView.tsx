@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { Download, RotateCcw, Building2, Trophy, FileText, Loader2 } from "lucide-react";
 import type { AnalysisReport } from "@/hooks/useResultAnalysis";
 import { cn } from "@/lib/utils";

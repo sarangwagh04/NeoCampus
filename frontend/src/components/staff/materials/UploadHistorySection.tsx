@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { UploadedMaterial } from "@/hooks/useStaffStudyMaterials";
+import { type UploadedMaterial } from "@/hooks/useStaffStudyMaterials";
 import { format } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
 

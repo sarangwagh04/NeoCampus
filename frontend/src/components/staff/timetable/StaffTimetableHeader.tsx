@@ -1,6 +1,6 @@
 import { Calendar, Clock, Edit, X, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ClassYear } from "@/hooks/useStaffTimetableData";
+import { type ClassYear } from "@/hooks/useStaffTimetableData";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface StaffTimetableHeaderProps {

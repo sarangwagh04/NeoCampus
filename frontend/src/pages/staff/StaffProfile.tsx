@@ -8,7 +8,7 @@ import { StaffSystemInfoSection } from "@/components/staff/profile/StaffSystemIn
 import { Button } from "@/components/ui/button";
 import { InlineBanner } from "@/components/ui/inline-banner";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useStaffProfile, EditableStaffFields } from "@/hooks/useStaffProfile";
+import { useStaffProfile, type EditableStaffFields } from "@/hooks/useStaffProfile";
 import { Edit, X, Save, Loader2 } from "lucide-react";
 
 export default function StaffProfile() {

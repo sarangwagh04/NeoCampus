@@ -17,22 +17,14 @@ import {
   DialogTrigger,
   DialogDescription,
 } from "@/components/ui/dialog";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Calendar as CalendarIcon, ClipboardList, Download, FileSpreadsheet, FileText, ChevronDown } from "lucide-react";
+import { BookOpen, Calendar as CalendarIcon, ClipboardList, Download, FileSpreadsheet, FileText } from "lucide-react";
 import { Link } from "react-router-dom";
-import { AssignedSubject } from "@/hooks/useStaffAttendanceData";
-import { generateAttendanceReportPDF, generateAttendanceReportExcel, AttendanceReportFilters } from "@/utils/generateAttendanceReport";
+import { type AssignedSubject } from "@/hooks/useStaffAttendanceData";
+import { generateAttendanceReportPDF, generateAttendanceReportExcel, type AttendanceReportFilters } from "@/utils/generateAttendanceReport";
 import { toast } from "sonner";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
 
 interface AssignedSubjectsTableProps {
   subjects: AssignedSubject[];

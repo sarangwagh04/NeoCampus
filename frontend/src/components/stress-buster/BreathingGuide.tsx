@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { X, Volume2, VolumeX } from "lucide-react";
+import { X } from "lucide-react";
 
 interface BreathingGuideProps {
   onClose: () => void;
@@ -17,8 +17,7 @@ const PHASES: { phase: Phase; duration: number; label: string }[] = [
 
 export function BreathingGuide({ onClose }: BreathingGuideProps) {
   const [currentPhaseIndex, setCurrentPhaseIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
+  const [isPaused] = useState(false);
 
   const currentPhase = PHASES[currentPhaseIndex];
 

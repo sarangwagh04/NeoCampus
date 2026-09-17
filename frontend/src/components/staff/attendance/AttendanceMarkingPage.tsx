@@ -38,11 +38,11 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import * as XLSX from "xlsx";
 import {
-  AssignedSubject,
-  Student,
-  TeachingPlanLecture,
-  AttendanceRecord,
-  LectureAttendance,
+  type AssignedSubject,
+  type Student,
+  type TeachingPlanLecture,
+  type AttendanceRecord,
+  type LectureAttendance,
 } from "@/hooks/useStaffAttendanceData";
 import { AttendanceCorrectionModal } from "./AttendanceCorrectionModal";
 import { CompletedLecturesView } from "./CompletedLecturesView";

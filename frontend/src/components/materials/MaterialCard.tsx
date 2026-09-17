@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { StudyMaterial } from "@/hooks/useStudyMaterials";
+import { type StudyMaterial } from "@/hooks/useStudyMaterials";
 import { FileAttachment } from "./FileAttachment";
 import { ReferenceLink } from "./ReferenceLink";
 import { format } from "date-fns";

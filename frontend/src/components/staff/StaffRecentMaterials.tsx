@@ -1,4 +1,4 @@
-import { BookOpen, FileText, ExternalLink, Calendar, Users } from "lucide-react";
+import { BookOpen, FileText, Calendar, Users } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";

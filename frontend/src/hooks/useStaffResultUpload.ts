@@ -9,6 +9,7 @@ export interface AcademicContext {
 
 export interface StudentResult {
   rollNumber: string;
+  studentName?: string;
   subjectName: string;
   internalMarks: string;
   externalMarks: string;

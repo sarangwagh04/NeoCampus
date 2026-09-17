@@ -14,8 +14,8 @@ import { Save } from "lucide-react";
 import api from "@/api/axios";
 
 import {
-  Student,
-  TeachingPlanLecture,
+  type Student,
+  type TeachingPlanLecture,
 } from "@/hooks/useStaffAttendanceData";
 
 interface AttendanceCorrectionModalProps {

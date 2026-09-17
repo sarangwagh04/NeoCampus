@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import api from "@/api/axios"; // ✅ ADDED: Real API
-import { TimetableData, TimeSlot } from "@/hooks/useTimetableData";
+import { type TimetableData, type TimeSlot } from "@/hooks/useTimetableData";
 
 export type ClassYear = "F.E." | "S.E." | "T.E." | "B.E.";
 

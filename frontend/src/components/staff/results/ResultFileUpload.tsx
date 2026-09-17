@@ -2,7 +2,7 @@ import { useCallback, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Upload, FileSpreadsheet, X, CheckCircle, Loader2 } from "lucide-react";
-import { UploadedFile } from "@/hooks/useStaffResultUpload";
+import { type UploadedFile } from "@/hooks/useStaffResultUpload";
 import { cn } from "@/lib/utils";
 
 interface ResultFileUploadProps {

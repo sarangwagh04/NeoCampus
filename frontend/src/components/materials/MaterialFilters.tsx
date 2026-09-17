@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Subject, SortOption } from "@/hooks/useStudyMaterials";
+import { type Subject, type SortOption } from "@/hooks/useStudyMaterials";
 
 interface MaterialFiltersProps {
   subjects: Subject[];

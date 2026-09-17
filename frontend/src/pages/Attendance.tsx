@@ -6,7 +6,7 @@ import { SubjectAttendanceTable } from "@/components/attendance/SubjectAttendanc
 import { useAttendanceData } from "@/hooks/useAttendanceData";
 
 export default function Attendance() {
-  const [selectedSemester, setSelectedSemester] = useState("current");
+  const [selectedSemester] = useState("current");
   const { data, isLoading, error } = useAttendanceData(selectedSemester);
 
   return (

@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { FileText, Sparkles, Check, Lock, Zap, Brain, TrendingUp, BarChart3, FlaskConical, Loader2 } from "lucide-react";
+import { FileText, Sparkles, Check, Zap, Brain, TrendingUp, BarChart3, FlaskConical, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SparkleParticles } from "@/components/ui/sparkle-particles";
 import type { AnalysisMethod } from "@/hooks/useResultAnalysis";

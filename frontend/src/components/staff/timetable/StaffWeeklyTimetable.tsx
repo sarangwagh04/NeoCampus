@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { TimetableData, LectureSlot, TimeSlot } from "@/hooks/useTimetableData";
-import { ClassYear, SubjectOption } from "@/hooks/useStaffTimetableData";
+import { type TimetableData, type LectureSlot, type TimeSlot } from "@/hooks/useTimetableData";
+import { type SubjectOption } from "@/hooks/useStaffTimetableData";
 import { Clock, MapPin, User, Edit2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";

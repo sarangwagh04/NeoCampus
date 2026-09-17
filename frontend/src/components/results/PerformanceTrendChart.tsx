@@ -9,7 +9,7 @@ import {
   Legend,
 } from "recharts";
 import { TrendingUp } from "lucide-react";
-import { PerformanceTrend } from "@/hooks/useStudentResults";
+import { type PerformanceTrend } from "@/hooks/useStudentResults";
 
 interface PerformanceTrendChartProps {
   data: PerformanceTrend[];
@@ -60,10 +60,10 @@ export function PerformanceTrendChart({ data }: PerformanceTrendChartProps) {
                   boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
                 }}
                 labelFormatter={(value) => `Semester ${value}`}
-                formatter={(value: number, name: string) => [
-                  value.toFixed(2),
+                formatter={((value: any, name: any) => [
+                  Number(value).toFixed(2),
                   name === "sgpa" ? "SGPA" : "CGPA",
-                ]}
+                ]) as any}
               />
               <Legend
                 formatter={(value) => (value === "sgpa" ? "SGPA" : "CGPA")}

@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, ArrowRight, BookOpen } from "lucide-react";
-import { AcademicContext } from "@/hooks/useStaffResultUpload";
+import { type AcademicContext } from "@/hooks/useStaffResultUpload";
 import { cn } from "@/lib/utils";
 import api from "@/api/axios";
 
