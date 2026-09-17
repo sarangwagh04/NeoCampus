@@ -68,50 +68,56 @@ class LoginView(TokenObtainPairView):
 class HardwareSignatureLoginView(APIView):
     """
     Handles secure hardware login via digital signature verification.
+    Currently disabled for production.
     """
     permission_classes = [] # Allow unauthenticated attempts
 
     def post(self, request):
-        username = request.data.get("username")
-        challenge = request.data.get("challenge")
-        signature_b64 = request.data.get("signature")
+        # username = request.data.get("username")
+        # challenge = request.data.get("challenge")
+        # signature_b64 = request.data.get("signature")
 
-        if not all([username, challenge, signature_b64]):
-            return Response({"error": "Missing parameters"}, status=status.HTTP_400_BAD_REQUEST)
+        # if not all([username, challenge, signature_b64]):
+        #     return Response({"error": "Missing parameters"}, status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            from django.contrib.auth.models import User
-            user = User.objects.get(username=username)
+        # try:
+        #     from django.contrib.auth.models import User
+        #     user = User.objects.get(username=username)
             
-            # 1. Fetch user's public key from Profile
-            profile = None
-            if hasattr(user, 'student_profile'):
-                profile = user.student_profile
-            elif hasattr(user, 'staff_profile'):
-                profile = user.staff_profile
+        #     # 1. Fetch user's public key from Profile
+        #     profile = None
+        #     if hasattr(user, 'student_profile'):
+        #         profile = user.student_profile
+        #     elif hasattr(user, 'staff_profile'):
+        #         profile = user.staff_profile
             
-            if not profile or not profile.hardware_public_key:
-                return Response({"error": "Hardware key not registered for this user"}, status=status.HTTP_401_UNAUTHORIZED)
+        #     if not profile or not profile.hardware_public_key:
+        #         return Response({"error": "Hardware key not registered for this user"}, status=status.HTTP_401_UNAUTHORIZED)
 
-            # 2. Reconstruct Public Key
-            public_key = serialization.load_pem_public_key(
-                profile.hardware_public_key.encode('utf-8')
-            )
+        #     # 2. Reconstruct Public Key
+        #     public_key = serialization.load_pem_public_key(
+        #         profile.hardware_public_key.encode('utf-8')
+        #     )
 
-            # 3. Verify Signature
-            signature = base64.b64decode(signature_b64)
-            public_key.verify(signature, challenge.encode('utf-8'))
+        #     # 3. Verify Signature
+        #     signature = base64.b64decode(signature_b64)
+        #     public_key.verify(signature, challenge.encode('utf-8'))
 
-            # 4. If verification reaches here, it succeeded! Issue JWT
-            token = CustomTokenSerializer.get_token(user)
-            return Response({
-                'refresh': str(token),
-                'access': str(token.access_token),
-            })
+        #     # 4. If verification reaches here, it succeeded! Issue JWT
+        #     token = CustomTokenSerializer.get_token(user)
+        #     return Response({
+        #         'refresh': str(token),
+        #         'access': str(token.access_token),
+        #     })
 
-        except (User.DoesNotExist, InvalidSignature, Exception) as e:
-            print("❌ Hardware Auth Error:", str(e), type(e))
-            return Response({"error": "Hardware authentication failed"}, status=status.HTTP_401_UNAUTHORIZED)
+        # except (User.DoesNotExist, InvalidSignature, Exception) as e:
+        #     print("❌ Hardware Auth Error:", str(e), type(e))
+        #     return Response({"error": "Hardware authentication failed"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        return Response(
+            {"error": "Hardware verification is currently disabled."}, 
+            status=status.HTTP_503_SERVICE_UNAVAILABLE
+        )
 
 
 def hardware_auth_status(request):
