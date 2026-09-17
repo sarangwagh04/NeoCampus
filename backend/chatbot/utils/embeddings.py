@@ -1,8 +1,8 @@
-from sentence_transformers import SentenceTransformer   #for reduce runservertime
+# from sentence_transformers import SentenceTransformer   #for reduce runservertime
 import pickle
 
 # Load once (important for performance}
-_model = SentenceTransformer("all-MiniLM-L6-v2")   #for reduce runservertime
+# _model = SentenceTransformer("all-MiniLM-L6-v2")   #for reduce runservertime
 
 
 def generate_embedding(text: str) -> bytes:
