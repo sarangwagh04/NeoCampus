@@ -174,7 +174,7 @@ export function StudyMaterialUploadForm({ onSuccess, onError }: StudyMaterialUpl
               </SelectTrigger>
               <SelectContent>
                 {assignedSubjects.map((subject) => (
-                  <SelectItem key={subject.id} value={subject.id}>
+                  <SelectItem key={subject.id} value={String(subject.id)}>
                     {subject.code} - {subject.name}
                   </SelectItem>
                 ))}

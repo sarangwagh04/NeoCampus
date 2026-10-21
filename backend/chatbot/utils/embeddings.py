@@ -1,8 +1,14 @@
-# from sentence_transformers import SentenceTransformer   #for reduce runservertime
 import pickle
 
-# Load once (important for performance}
-# _model = SentenceTransformer("all-MiniLM-L6-v2")   #for reduce runservertime
+# Lazy-loaded model to keep runserver startup fast
+_model = None
+
+def get_model():
+    global _model
+    if _model is None:
+        from sentence_transformers import SentenceTransformer
+        _model = SentenceTransformer("all-MiniLM-L6-v2")
+    return _model
 
 
 def generate_embedding(text: str) -> bytes:
@@ -10,7 +16,8 @@ def generate_embedding(text: str) -> bytes:
     Generate embedding for text and serialize it
     for database storage.
     """
-    vector = _model.encode(text)
+    model = get_model()
+    vector = model.encode(text)
     return pickle.dumps(vector)
 
 

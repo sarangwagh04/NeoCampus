@@ -239,18 +239,6 @@ const Login = () => {
                   </button>
                 </motion.div>
               </form>
-
-              {/* Admin Note */}
-              <motion.div
-                className="mt-6 p-4 bg-muted/30 dark:bg-muted/20 rounded-xl border border-border/30"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.7 }}
-              >
-                <p className="text-xs text-muted-foreground text-center leading-relaxed">
-                  <span className="font-semibold text-foreground/80">Admin?</span> Use <a href="http://127.0.0.1:8000/admin/" className="text-primary hover:underline font-medium">admin portal</a> for administrative access.
-                </p>
-              </motion.div>
             </CardContent>
           </Card>
         </motion.div>

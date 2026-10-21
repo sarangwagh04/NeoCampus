@@ -100,9 +100,9 @@ export function ResultPreviewTable({ isActive, results, summary }: ResultPreview
               </TableRow>
             </TableHeader>
             <TableBody>
-              {results.map((result) => (
+              {results.map((result, idx) => (
                 <TableRow
-                  key={`${result.rollNumber}-${result.studentName}`}
+                  key={`${result.rollNumber}-${result.subjectName}-${idx}`}
                   className={cn(
                     result.status === "Fail" && "bg-destructive/5"
                   )}

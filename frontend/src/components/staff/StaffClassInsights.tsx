@@ -2,7 +2,6 @@ import { TrendingUp, Users, BarChart } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ClassPerformance } from "@/hooks/useStaffResultUpload";
 import { cn } from "@/lib/utils";
 
 interface StaffClassInsightsProps {

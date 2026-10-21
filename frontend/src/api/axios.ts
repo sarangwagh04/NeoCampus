@@ -4,8 +4,12 @@ import axios, {
   InternalAxiosRequestConfig,
 } from "axios";
 
+export const API_BASE_URL =
+  (import.meta.env.VITE_API_BASE_URL ? import.meta.env.VITE_API_BASE_URL.replace(/\/+$/, "") : "") ||
+  "http://127.0.0.1:8000/api";
+
 const api: AxiosInstance = axios.create({
-  baseURL: "http://127.0.0.1:8000/api",
+  baseURL: API_BASE_URL,
 });
 
 // 🔐 Attach Access Token
@@ -43,7 +47,7 @@ api.interceptors.response.use(
         }
 
         const res = await axios.post(
-          "http://127.0.0.1:8000/api/token/refresh/",
+          `${API_BASE_URL}/token/refresh/`,
           { refresh: refreshToken }
         );
 

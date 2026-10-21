@@ -10,6 +10,7 @@ import { Footer } from "@/components/landing/Footer";
 import { FloatingNav } from "@/components/landing/FloatingNav";
 import SplashCursor from "@/components/landing/SplashCursor";
 import { AuroraBackground } from "@/components/landing/aurora-background";
+import { API_BASE_URL } from "@/api/axios";
 
 const Landing = () => {
   const [splashCursorEnabled, setSplashCursorEnabled] = useState(true);
@@ -21,7 +22,7 @@ useEffect(() => {
     const initAuthCheck = async () => {
       try {
         // 1. Wake up the listener because we are on the landing page
-        await fetch("http://127.0.0.1:8000/api/home/hardware-listener-state/", {
+        await fetch(`${API_BASE_URL}/home/hardware-listener-state/`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ active: true })
@@ -35,7 +36,7 @@ useEffect(() => {
     const interval = setInterval(async () => {
       try {
         const res = await fetch(
-          "http://127.0.0.1:8000/api/home/hardware-auth-status/"
+          `${API_BASE_URL}/home/hardware-auth-status/`
         );
       const data = await res.json();
 
@@ -56,7 +57,7 @@ useEffect(() => {
         );
 
         await fetch(
-          "http://127.0.0.1:8000/api/home/delete-hardware-auth/"
+          `${API_BASE_URL}/home/delete-hardware-auth/`
         );
 
         clearInterval(interval);

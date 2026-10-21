@@ -6,7 +6,7 @@ interface FileAttachmentProps {
   file: FileAttachmentType;
 }
 
-const fileIcons = {
+const fileIcons: Record<string, any> = {
   pdf: FileText,
   ppt: Presentation,
   doc: FileText,
@@ -15,7 +15,7 @@ const fileIcons = {
   other: File,
 };
 
-const fileColors = {
+const fileColors: Record<string, string> = {
   pdf: "text-red-500",
   ppt: "text-orange-500",
   doc: "text-blue-500",

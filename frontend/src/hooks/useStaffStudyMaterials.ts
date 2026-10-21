@@ -7,13 +7,28 @@ export interface Notice {
   id: number;
   title: string;
   subject_code?: string;
+  uploaded_by?: string;
   created_at: string;
 }
+
+export type UploadedMaterial = Notice;
 
 export interface Subject {
   id: number;
   name: string;
   code: string;
+}
+
+export interface StudyMaterialDraft {
+  academicContext: {
+    subjectId?: string;
+    batchId?: string;
+    is_public: boolean;
+  };
+  title: string;
+  staffMessage: string;
+  referenceLinks: string[];
+  files: File[];
 }
 
 export function useStaffStudyMaterials() {

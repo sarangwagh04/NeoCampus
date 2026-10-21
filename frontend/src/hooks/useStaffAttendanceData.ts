@@ -70,7 +70,7 @@ export interface LectureAttendance {
 
 export interface StaffRole {
   isHod: boolean;
-  department: string;
+  department: string | null;
 }
 
 /* ======================================================

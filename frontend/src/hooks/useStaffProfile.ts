@@ -2,7 +2,9 @@
 // Only this file changed
 
 import { useState, useEffect, useCallback } from "react";
-import api from "@/api/axios";
+import api, { API_BASE_URL } from "@/api/axios";
+
+const SERVER_ORIGIN = API_BASE_URL.replace(/\/api\/?$/, "");
 
 export interface StaffProfileData {
   firstName: string;
@@ -65,7 +67,7 @@ export function useStaffProfile() {
           mobileNumber: data.mobile_number,
           address: data.address,
           profilePicture: data.profile_picture
-            ? `http://127.0.0.1:8000${data.profile_picture}`
+            ? `${SERVER_ORIGIN}${data.profile_picture}`
             : "",
 
           branch: data.branch,

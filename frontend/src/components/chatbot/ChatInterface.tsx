@@ -5,6 +5,7 @@ import { ChatInput } from "./ChatInput";
 import { EmptyState } from "./EmptyState";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { API_BASE_URL } from "@/api/axios";
 
 
 interface ChatInterfaceProps {
@@ -122,7 +123,7 @@ export function ChatInterface({ variant = "dashboard" }: ChatInterfaceProps) {
       ------------------------------------------ */
       if (selectedSubject.id === "add-updates") {
         const response = await fetch(
-          "http://127.0.0.1:8000/api/chatbot/post-update/",
+          `${API_BASE_URL}/chatbot/post-update/`,
           {
             method: "POST",
             headers: {
@@ -212,7 +213,7 @@ export function ChatInterface({ variant = "dashboard" }: ChatInterfaceProps) {
          ✅ NORMAL CHAT (Other mode - Non-RAG)
       ------------------------------------------ */
       const response = await fetch(
-        "http://127.0.0.1:8000/api/chatbot/ask/",
+        `${API_BASE_URL}/chatbot/ask/`,
         {
           method: "POST",
           headers: {
