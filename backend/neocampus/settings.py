@@ -39,8 +39,16 @@ VAPID_ADMIN_EMAIL = config("VAPID_ADMIN_EMAIL", default="sarangwagh54321@gmail.c
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", default=False, cast=bool)
 
-# ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="").split(",") #for deployment commented out
-ALLOWED_HOSTS = ["*"]
+raw_allowed_hosts = config("ALLOWED_HOSTS", default="*")
+if raw_allowed_hosts.strip() == "*":
+    ALLOWED_HOSTS = ["*"]
+else:
+    ALLOWED_HOSTS = [
+        host.strip().replace("https://", "").replace("http://", "").rstrip("/")
+        for host in raw_allowed_hosts.split(",")
+        if host.strip()
+    ]
+    ALLOWED_HOSTS.extend([".onrender.com", "localhost", "127.0.0.1"])
 
 
 INTERNAL_IPS = [
@@ -171,7 +179,40 @@ LOGOUT_REDIRECT_URL = '/admin/'                   # after logout
 
 
 
-CORS_ALLOW_ALL_ORIGINS = True
+raw_cors = config("CORS_ALLOWED_ORIGINS", default="")
+if raw_cors.strip():
+    CORS_ALLOWED_ORIGINS = [
+        origin.strip().rstrip("/")
+        for origin in raw_cors.split(",")
+        if origin.strip()
+    ]
+    CORS_ALLOWED_ORIGINS.extend([
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ])
+    CORS_ALLOW_ALL_ORIGINS = False
+else:
+    CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOW_CREDENTIALS = True
+
+raw_csrf = config("CSRF_TRUSTED_ORIGINS", default="")
+if raw_csrf.strip():
+    CSRF_TRUSTED_ORIGINS = [
+        origin.strip().rstrip("/")
+        if origin.strip().startswith(("http://", "https://"))
+        else f"https://{origin.strip().rstrip('/')}"
+        for origin in raw_csrf.split(",")
+        if origin.strip()
+    ]
+else:
+    CSRF_TRUSTED_ORIGINS = [
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ]
+
+if "https://*.onrender.com" not in CSRF_TRUSTED_ORIGINS:
+    CSRF_TRUSTED_ORIGINS.append("https://*.onrender.com")
 
 from datetime import timedelta
 
