@@ -244,6 +244,9 @@ const Login = () => {
                   >
                     Admin
                   </button>
+                  <p className="w-full text-center text-[11px] text-muted-foreground/80 mt-2">
+                    ✨ Demo Mode: Test freely. Database resets daily with fresh baseline data.
+                  </p>
                 </motion.div>
               </form>
             </CardContent>

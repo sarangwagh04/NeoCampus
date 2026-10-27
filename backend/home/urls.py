@@ -1,6 +1,21 @@
 # home/urls.py
 from django.urls import path
-from .views import LoginView, RecentMaterialsView, StaffDashboardView, StudentDashboardView, TodayScheduleView, delete_hardware_auth, hardware_auth_status, HardwareSignatureLoginView, GetDrivesView, RegisterHardwareKeyView, SetListenerStateView, ChangePasswordView
+from .views import (
+    LoginView,
+    RecentMaterialsView,
+    StaffDashboardView,
+    StudentDashboardView,
+    TodayScheduleView,
+    delete_hardware_auth,
+    hardware_auth_status,
+    HardwareSignatureLoginView,
+    GetDrivesView,
+    RegisterHardwareKeyView,
+    SetListenerStateView,
+    ChangePasswordView,
+    DemoStatusView,
+    DemoResetTriggerView,
+)
 
 urlpatterns = [
     path("hardware-signature-login/", HardwareSignatureLoginView.as_view()),
@@ -18,4 +33,9 @@ urlpatterns = [
     path("today-schedule/", TodayScheduleView.as_view(), name="today-schedule"), #fetching today's schedule for student dashboard
     path("recent-materials/", RecentMaterialsView.as_view(), name="recent-materials"), #fetching recent materials for student dashboard
     path("staff-dashboard/", StaffDashboardView.as_view(), name="staff-dashboard"), #fetching staff profile card  for staff dashboard
+
+    # Demo Management
+    path("demo-status/", DemoStatusView.as_view(), name="demo-status"),
+    path("demo-reset/", DemoResetTriggerView.as_view(), name="demo-reset"),
 ]
+

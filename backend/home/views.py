@@ -754,3 +754,66 @@ class StaffDashboardView(APIView):
             "todayClasses": today_classes,
             "announcements": []
         })
+
+
+from .models import DemoResetLog
+from home.services.demo_seeder import reset_and_seed_demo_data
+
+
+class DemoStatusView(APIView):
+    """
+    GET /api/auth/demo-status/
+    Publicly exposes current demo status, last reset timestamp,
+    interval hours, and demo credentials for seamless demo evaluations.
+    """
+    permission_classes = []
+
+    def get(self, request):
+        demo_mode = getattr(settings, "DEMO_MODE", True)
+        interval_hours = getattr(settings, "DEMO_RESET_INTERVAL_HOURS", 24)
+        last_reset = DemoResetLog.objects.filter(status="SUCCESS").first()
+
+        next_reset = None
+        if last_reset:
+            next_reset = (last_reset.reset_at + timedelta(hours=int(interval_hours))).isoformat()
+
+        return Response({
+            "demo_mode": demo_mode,
+            "reset_interval_hours": interval_hours,
+            "last_reset": last_reset.reset_at.isoformat() if last_reset else None,
+            "next_scheduled_reset": next_reset,
+            "accounts": {
+                "student": {"username": "student1", "email": "student@neocampus.com", "password": "student123", "role": "Student"},
+                "staff": {"username": "staff1", "email": "staff@neocampus.com", "password": "staff123", "role": "Faculty / Lecturer"},
+                "hod": {"username": "staff_hod", "email": "hod@neocampus.com", "password": "staff123", "role": "HOD (Computer Science)"},
+                "admin": {"username": "admin", "email": "admin@neocampus.com", "password": "admin123", "role": "Super Admin"},
+            }
+        })
+
+
+class DemoResetTriggerView(APIView):
+    """
+    POST /api/auth/demo-reset/
+    Triggers an on-demand demo reset and re-seed.
+    Allows external schedulers, admin scripts, or demo reviewers to reset anytime.
+    """
+    permission_classes = []
+
+    def post(self, request):
+        secret = getattr(settings, "DEMO_RESET_SECRET", None)
+        provided_secret = request.headers.get("X-Demo-Reset-Secret") or request.data.get("secret")
+
+        if secret and secret != provided_secret:
+            return Response({"error": "Unauthorized demo reset request"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        try:
+            result = reset_and_seed_demo_data(triggered_by="api_trigger")
+            return Response({
+                "message": "Demo database successfully reset and seeded",
+                "result": result,
+            }, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({
+                "error": "Failed to reset demo database",
+                "detail": str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

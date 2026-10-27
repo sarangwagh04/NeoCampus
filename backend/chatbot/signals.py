@@ -10,11 +10,24 @@ def auto_create_chunks(sender, instance, created, **kwargs):
     if not created:
         return
 
-    if not instance.file.name.lower().endswith(".pdf"):
+    if not instance.file or not instance.file.name.lower().endswith(".pdf"):
         return
 
-    pdf_path = instance.file.path
-    chunks = generate_chunks_from_pdf(pdf_path)
+    import os
+    try:
+        pdf_path = instance.file.path
+    except Exception:
+        return
+
+    if not os.path.exists(pdf_path):
+        return
+
+    try:
+        chunks = generate_chunks_from_pdf(pdf_path)
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).warning("Could not extract chunks from %s: %s", pdf_path, e)
+        return
 
     chunk_objects = []
 

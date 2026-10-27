@@ -44,10 +44,14 @@ ALLOWED_HOSTS = [
     host.strip().removeprefix("https://").removeprefix("http://").rstrip("/")
     for host in config(
         "ALLOWED_HOSTS",
-        default="localhost,127.0.0.1"
+        default="localhost,127.0.0.1,neocampus-wylk.onrender.com,.onrender.com,*"
     ).split(",")
     if host.strip()
 ]
+ALLOWED_HOSTS.extend([
+    "neocampus-wylk.onrender.com",
+    ".onrender.com",
+])
 
 
 INTERNAL_IPS = [
@@ -86,6 +90,7 @@ MIDDLEWARE = [
     "debug_toolbar.middleware.DebugToolbarMiddleware", # Django Debug Toolbar for API Trakcing - Sarang
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'home.middleware.DemoAutoResetMiddleware', # Daily demo reset check - NeoCampus
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -189,8 +194,10 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOWED_ORIGINS.extend([
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "https://neocampus-frontend.onrender.com",
 ])
-CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOW_ALL_ORIGINS = config("CORS_ALLOW_ALL_ORIGINS", default=True, cast=bool)
 CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
@@ -201,6 +208,24 @@ CSRF_TRUSTED_ORIGINS = [
     ).split(",")
     if origin.strip()
 ]
+CSRF_TRUSTED_ORIGINS.extend([
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://neocampus-frontend.onrender.com",
+    "https://neocampus-wylk.onrender.com",
+])
+
+# Authentication Backends (supports login by username or email)
+AUTHENTICATION_BACKENDS = [
+    "home.auth_backend.EmailOrUsernameModelBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
+
+# Demo Environment Settings
+DEMO_MODE = config("DEMO_MODE", default=True, cast=bool)
+DEMO_RESET_INTERVAL_HOURS = config("DEMO_RESET_INTERVAL_HOURS", default=24, cast=int)
+DEMO_RESET_SECRET = config("DEMO_RESET_SECRET", default="")
+
 
 from datetime import timedelta
 

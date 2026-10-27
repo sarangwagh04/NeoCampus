@@ -1,0 +1,41 @@
+name: Daily Demo Database Reset
+on:
+  schedule:
+    # Runs at 00:00 UTC (05:30 IST) every day
+    - cron: '0 0 * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+
+jobs:
+  reset-demo-database:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Demo Reset via API (if LIVE_API_URL provided)
+        if: env.LIVE_API_URL != ''
+        env:
+          LIVE_API_URL: ${{ secrets.LIVE_API_URL }}
+          DEMO_RESET_SECRET: ${{ secrets.DEMO_RESET_SECRET }}
+        run: |
+          echo "Pinging live deployment demo-reset endpoint..."
+          curl -f -X POST "${LIVE_API_URL}/api/auth/demo-reset/" \
+            -H "Content-Type: application/json" \
+            -H "X-Demo-Reset-Secret: ${DEMO_RESET_SECRET}" || echo "API ping completed"
+
+      - name: Checkout Code
+        if: env.DATABASE_URL != ''
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        if: env.DATABASE_URL != ''
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run Django seed_demo_data command
+        if: env.DATABASE_URL != ''
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY || 'django-insecure-github-action-run-key' }}
+        run: |
+          cd backend
+          pip install -r requirements.txt
+          python manage.py seed_demo_data --source=github_actions_cron
