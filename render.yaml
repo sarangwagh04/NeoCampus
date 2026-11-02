@@ -45,7 +45,7 @@ services:
   # 2. REACT FRONTEND STATIC SITE
   # -------------------------------------------------------------
   - type: web
-    name: neocampus-frontend
+    name: neocampus
     runtime: static
     rootDir: frontend
     buildCommand: "npm install && npm run build"
