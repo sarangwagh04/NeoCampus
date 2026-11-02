@@ -51,6 +51,8 @@ urlpatterns = [
 
 
 # ✅ SERVE MEDIA FILES IN DEVELOPMENT AND PRODUCTION (FOR DEMO/STANDALONE DEPLOYS)
+# Matches both /media/... and /api/media/... for frontend compatibility
 urlpatterns += [
-    re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
-]
+    re_path(r'^(?:api/)?media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+]
+

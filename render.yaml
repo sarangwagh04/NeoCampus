@@ -19,17 +19,27 @@ services:
       - key: DEBUG
         value: "False"
       - key: ALLOWED_HOSTS
-        value: "neocampus-wylk.onrender.com,.onrender.com,*"
+        value: "neocampus-backend.onrender.com,.onrender.com,localhost,127.0.0.1,*"
       - key: CORS_ALLOW_ALL_ORIGINS
         value: "True"
       - key: DEMO_MODE
         value: "True"
+      - key: RESET_TIMEZONE
+        value: "Asia/Kolkata"
+      - key: DEMO_RESET_HOUR
+        value: "0"
+      - key: DEMO_RESET_MINUTE
+        value: "0"
       - key: DEMO_RESET_INTERVAL_HOURS
         value: "24"
+      - key: DEMO_RESET_SECRET
+        generateValue: true
       - key: DATABASE_URL
         sync: false
       - key: SECRET_KEY
         generateValue: true
+      - key: CSRF_TRUSTED_ORIGINS
+        value: "https://*.onrender.com,http://localhost:5173,http://localhost:3000"
 
   # -------------------------------------------------------------
   # 2. REACT FRONTEND STATIC SITE
@@ -43,7 +53,7 @@ services:
     staticPublishPath: "./dist"
     envVars:
       - key: VITE_API_BASE_URL
-        value: "https://neocampus-wylk.onrender.com/api"
+        value: "https://neocampus-backend.onrender.com/api"
     routes:
       - type: rewrite
         source: "/*"

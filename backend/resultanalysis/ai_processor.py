@@ -1,32 +1,48 @@
 import os
 import csv
 from io import BytesIO, StringIO
-from pdf2image import convert_from_bytes
 from PIL import Image
 from openpyxl import Workbook
 from google import genai
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+POPLER_PATH = os.path.join(BASE_DIR, "poppler-25.12.0", "Library", "bin")
 
-POPLER_PATH = r"C:\poppler-25.12.0\Library\bin"
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 
-if not GEMINI_API_KEY:
-    raise RuntimeError(
-        "API Key Not Found, Contact Admin"
-    )
+def get_gemini_client():
+    api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GEMINI_API_KEY2")
+    if not api_key:
+        raise RuntimeError(
+            "GEMINI_API_KEY not configured. Please set the GEMINI_API_KEY environment variable in Render."
+        )
+    return genai.Client(api_key=api_key)
 
 
 def pdf_first_page_to_image(pdf_bytes: bytes):
-    images = convert_from_bytes(
-        pdf_bytes,
-        dpi=350,
-        first_page=1,
-        last_page=1,
-        poppler_path=POPLER_PATH
-    )
+    """
+    Renders the first page of a PDF as a grayscale PIL Image.
+    Prefers pypdfium2 (zero system dependencies, cross-platform),
+    with fallback to pdf2image if available.
+    """
+    img = None
+    try:
+        import pypdfium2 as pdfium
+        pdf = pdfium.PdfDocument(pdf_bytes)
+        page = pdf[0]
+        img = page.render(scale=3).to_pil().convert("L")
+    except Exception as e:
+        print(f"[AI] pypdfium2 rendering fallback: {e}")
+        from pdf2image import convert_from_bytes
+        kwargs = {"dpi": 350, "first_page": 1, "last_page": 1}
+        if os.path.exists(POPLER_PATH):
+            kwargs["poppler_path"] = POPLER_PATH
+        images = convert_from_bytes(pdf_bytes, **kwargs)
+        img = images[0].convert("L")
 
-    img = images[0].convert("L")
-    img.save("debug_page.png")
+    try:
+        img.save("debug_page.png")
+    except Exception:
+        pass
 
     img_bytes = BytesIO()
     img.save(img_bytes, format="PNG")
@@ -36,7 +52,7 @@ def pdf_first_page_to_image(pdf_bytes: bytes):
 
 
 def extract_csv_from_image(image_bytes: BytesIO):
-    client = genai.Client(api_key=GEMINI_API_KEY)
+    client = get_gemini_client()
 
     prompt = """
 You are an academic result data extractor.
@@ -102,15 +118,10 @@ Return ONLY CSV.
         print(f"Total Tokens  : {total_tokens}")
         print(f"Estimated Cost: ${total_cost_usd:.6f} (~₹{total_cost_inr:.2f})")
 
-
     return csv_text
 
 
 def csv_to_excel_file(csv_text: str):
-    from io import StringIO
-    import csv
-    from openpyxl import Workbook
-
     csv_io = StringIO(csv_text)
     reader = list(csv.reader(csv_io))
 
@@ -123,13 +134,11 @@ def csv_to_excel_file(csv_text: str):
     cleaned_rows = [header]
 
     for i, row in enumerate(reader[1:], start=2):
-
         # If row has more columns → merge extras into last column
         if len(row) > header_len:
             row = row[:header_len-1] + [
                 ",".join(row[header_len-1:])
             ]
-
         # If row has fewer columns → pad with "-"
         elif len(row) < header_len:
             row = row + ["-"] * (header_len - len(row))

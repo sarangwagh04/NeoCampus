@@ -12,7 +12,12 @@ class Command(BaseCommand):
             "--source",
             type=str,
             default="command",
-            help="Trigger source identifier (e.g. cron, command, deploy)",
+            help="Trigger source identifier (e.g. cron, command, deploy, github_actions_cron)",
+        )
+        parser.add_argument(
+            "--force",
+            action="store_true",
+            help="Force reset immediately regardless of previous reset schedule",
         )
 
     def handle(self, *args, **options):

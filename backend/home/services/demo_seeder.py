@@ -21,8 +21,96 @@ from profiles.models import StaffProfile, StudentProfile
 from results.models import ResultEntry, ResultUpload
 from timetables.models import Subject as TimetableSubject, TimeSlot, Timetable
 
+from zoneinfo import ZoneInfo
+from django.conf import settings
+
 logger = logging.getLogger(__name__)
 User = get_user_model()
+
+
+def should_reset_for_midnight(
+    last_reset_time=None,
+    reset_tz_name: str = "Asia/Kolkata",
+    reset_hour: int = 0,
+    reset_minute: int = 0
+) -> bool:
+    """
+    Checks if the daily 12:00 AM (midnight) reset cutoff has been crossed
+    since the last successful reset.
+    """
+    try:
+        tz = ZoneInfo(reset_tz_name)
+    except Exception:
+        tz = ZoneInfo("Asia/Kolkata")
+
+    now = timezone.now()
+    if timezone.is_naive(now):
+        now = timezone.make_aware(now, timezone.utc)
+    now = now.astimezone(tz)
+
+    if not last_reset_time:
+        return True
+
+    if timezone.is_naive(last_reset_time):
+        last_reset_time = timezone.make_aware(last_reset_time, timezone.utc)
+    last_reset_local = last_reset_time.astimezone(tz)
+
+    # Today's reset point (e.g. today at 00:00:00 midnight)
+    today_reset_point = now.replace(
+        hour=reset_hour,
+        minute=reset_minute,
+        second=0,
+        microsecond=0
+    )
+
+    if now >= today_reset_point:
+        # We are past today's reset point.
+        # If the last reset was before today's reset point, reset is due!
+        return last_reset_local < today_reset_point
+    else:
+        # We are before today's reset point (e.g. if hour != 0).
+        # Check against yesterday's reset point.
+        yesterday_reset_point = today_reset_point - timedelta(days=1)
+        return last_reset_local < yesterday_reset_point
+
+
+def get_next_scheduled_reset(
+    reset_tz_name: str = "Asia/Kolkata",
+    reset_hour: int = 0,
+    reset_minute: int = 0
+) -> dict:
+    """
+    Returns next scheduled midnight reset datetime, timezone name, and seconds remaining.
+    """
+    try:
+        tz = ZoneInfo(reset_tz_name)
+    except Exception:
+        tz = ZoneInfo("Asia/Kolkata")
+
+    now = timezone.now()
+    if timezone.is_naive(now):
+        now = timezone.make_aware(now, timezone.utc)
+    now = now.astimezone(tz)
+    today_reset_point = now.replace(
+        hour=reset_hour,
+        minute=reset_minute,
+        second=0,
+        microsecond=0
+    )
+
+    if now < today_reset_point:
+        next_reset = today_reset_point
+    else:
+        next_reset = today_reset_point + timedelta(days=1)
+
+    seconds_remaining = max(0, int((next_reset - now).total_seconds()))
+
+    return {
+        "next_reset_iso": next_reset.isoformat(),
+        "timezone": reset_tz_name,
+        "reset_time": f"{reset_hour:02d}:{reset_minute:02d} ({'Midnight / 12:00 AM' if reset_hour == 0 else f'{reset_hour}:{reset_minute:02d}'})",
+        "seconds_remaining": seconds_remaining,
+    }
 
 
 def reset_and_seed_demo_data(triggered_by: str = "auto") -> dict:
@@ -140,12 +228,23 @@ def reset_and_seed_demo_data(triggered_by: str = "auto") -> dict:
         if sarang_user:
             preserved_user_ids.add(sarang_user.id)
 
+        # Also preserve all superuser accounts created by admin
+        for su in User.objects.filter(is_superuser=True):
+            preserved_user_ids.add(su.id)
+
         # Also preserve cohort student users
         cohort_usernames = ["student2", "student3", "student4"]
         for cu in User.objects.filter(username__in=cohort_usernames):
             preserved_user_ids.add(cu.id)
 
         User.objects.exclude(id__in=preserved_user_ids).delete()
+
+        # Invalidate active demo sessions so fresh logins are required
+        try:
+            from django.contrib.sessions.models import Session
+            Session.objects.all().delete()
+        except Exception:
+            pass
 
         seeded_counts = {}
 

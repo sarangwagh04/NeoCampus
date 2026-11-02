@@ -757,31 +757,38 @@ class StaffDashboardView(APIView):
 
 
 from .models import DemoResetLog
-from home.services.demo_seeder import reset_and_seed_demo_data
+from home.services.demo_seeder import reset_and_seed_demo_data, get_next_scheduled_reset
 
 
 class DemoStatusView(APIView):
     """
     GET /api/auth/demo-status/
     Publicly exposes current demo status, last reset timestamp,
-    interval hours, and demo credentials for seamless demo evaluations.
+    night 12:00 AM reset schedule, and demo credentials for seamless demo evaluations.
     """
     permission_classes = []
 
     def get(self, request):
         demo_mode = getattr(settings, "DEMO_MODE", True)
-        interval_hours = getattr(settings, "DEMO_RESET_INTERVAL_HOURS", 24)
-        last_reset = DemoResetLog.objects.filter(status="SUCCESS").first()
+        tz_name = getattr(settings, "RESET_TIMEZONE", "Asia/Kolkata")
+        reset_hour = getattr(settings, "DEMO_RESET_HOUR", 0)
+        reset_minute = getattr(settings, "DEMO_RESET_MINUTE", 0)
 
-        next_reset = None
-        if last_reset:
-            next_reset = (last_reset.reset_at + timedelta(hours=int(interval_hours))).isoformat()
+        schedule_info = get_next_scheduled_reset(
+            reset_tz_name=tz_name,
+            reset_hour=reset_hour,
+            reset_minute=reset_minute,
+        )
+
+        last_reset = DemoResetLog.objects.filter(status="SUCCESS").first()
 
         return Response({
             "demo_mode": demo_mode,
-            "reset_interval_hours": interval_hours,
+            "schedule": "Daily at 12:00 AM (Midnight)",
+            "timezone": tz_name,
             "last_reset": last_reset.reset_at.isoformat() if last_reset else None,
-            "next_scheduled_reset": next_reset,
+            "next_scheduled_reset": schedule_info["next_reset_iso"],
+            "seconds_until_next_reset": schedule_info["seconds_remaining"],
             "accounts": {
                 "student": {"username": "student1", "email": "student@neocampus.com", "password": "student123", "role": "Student"},
                 "staff": {"username": "staff1", "email": "staff@neocampus.com", "password": "staff123", "role": "Faculty / Lecturer"},
@@ -793,23 +800,37 @@ class DemoStatusView(APIView):
 
 class DemoResetTriggerView(APIView):
     """
-    POST /api/auth/demo-reset/
+    POST or GET /api/auth/demo-reset/
     Triggers an on-demand demo reset and re-seed.
-    Allows external schedulers, admin scripts, or demo reviewers to reset anytime.
+    Allows external schedulers, cron-job.org, admin scripts, or demo reviewers to reset anytime.
     """
     permission_classes = []
 
-    def post(self, request):
+    def _execute_reset(self, request):
         secret = getattr(settings, "DEMO_RESET_SECRET", None)
-        provided_secret = request.headers.get("X-Demo-Reset-Secret") or request.data.get("secret")
+        provided_secret = (
+            request.headers.get("X-Demo-Reset-Secret")
+            or request.query_params.get("secret")
+            or (request.data.get("secret") if hasattr(request, "data") and isinstance(request.data, dict) else None)
+        )
 
-        if secret and secret != provided_secret:
-            return Response({"error": "Unauthorized demo reset request"}, status=status.HTTP_401_UNAUTHORIZED)
+        is_admin = request.user and request.user.is_authenticated and request.user.is_superuser
+        if secret and secret != provided_secret and not is_admin:
+            return Response(
+                {"error": "Unauthorized demo reset request. Missing or invalid secret token."},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        source = (
+            request.query_params.get("source")
+            or (request.data.get("source") if hasattr(request, "data") and isinstance(request.data, dict) else None)
+            or ("api_admin" if is_admin else "api_trigger")
+        )
 
         try:
-            result = reset_and_seed_demo_data(triggered_by="api_trigger")
+            result = reset_and_seed_demo_data(triggered_by=source)
             return Response({
-                "message": "Demo database successfully reset and seeded",
+                "message": "Demo database successfully reset and baseline restored.",
                 "result": result,
             }, status=status.HTTP_200_OK)
         except Exception as e:
@@ -817,3 +838,9 @@ class DemoResetTriggerView(APIView):
                 "error": "Failed to reset demo database",
                 "detail": str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def get(self, request):
+        return self._execute_reset(request)
+
+    def post(self, request):
+        return self._execute_reset(request)

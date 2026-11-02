@@ -44,13 +44,14 @@ ALLOWED_HOSTS = [
     host.strip().removeprefix("https://").removeprefix("http://").rstrip("/")
     for host in config(
         "ALLOWED_HOSTS",
-        default="localhost,127.0.0.1,neocampus-wylk.onrender.com,.onrender.com,*"
+        default="localhost,127.0.0.1,.onrender.com,*"
     ).split(",")
     if host.strip()
 ]
 ALLOWED_HOSTS.extend([
-    "neocampus-wylk.onrender.com",
     ".onrender.com",
+    "localhost",
+    "127.0.0.1",
 ])
 
 
@@ -128,14 +129,23 @@ WSGI_APPLICATION = 'neocampus.wsgi.application'
 #     }
 # } #for local system
 
-# Enable Neon Postgres via DATABASE_URL:
-DATABASES = {
-    "default": dj_database_url.parse(
-        config("DATABASE_URL"),
-        conn_max_age=600,
-        ssl_require=True,
-    )
-}
+# Database Configuration (Neon PostgreSQL on Render / fallback SQLite for initial setup)
+DATABASE_URL_ENV = config("DATABASE_URL", default="")
+if DATABASE_URL_ENV:
+    DATABASES = {
+        "default": dj_database_url.parse(
+            DATABASE_URL_ENV,
+            conn_max_age=600,
+            ssl_require=DATABASE_URL_ENV.startswith("postgres"),
+        )
+    }
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -209,10 +219,10 @@ CSRF_TRUSTED_ORIGINS = [
     if origin.strip()
 ]
 CSRF_TRUSTED_ORIGINS.extend([
+    "https://*.onrender.com",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-    "https://neocampus-frontend.onrender.com",
-    "https://neocampus-wylk.onrender.com",
+    "http://localhost:3000",
 ])
 
 # Authentication Backends (supports login by username or email)
@@ -221,8 +231,11 @@ AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
 ]
 
-# Demo Environment Settings
+# Demo Environment Settings & Daily Midnight Reset (12:00 AM)
 DEMO_MODE = config("DEMO_MODE", default=True, cast=bool)
+RESET_TIMEZONE = config("RESET_TIMEZONE", default="Asia/Kolkata")
+DEMO_RESET_HOUR = config("DEMO_RESET_HOUR", default=0, cast=int)       # 0 = 12:00 AM Midnight
+DEMO_RESET_MINUTE = config("DEMO_RESET_MINUTE", default=0, cast=int)   # 00 min
 DEMO_RESET_INTERVAL_HOURS = config("DEMO_RESET_INTERVAL_HOURS", default=24, cast=int)
 DEMO_RESET_SECRET = config("DEMO_RESET_SECRET", default="")
 

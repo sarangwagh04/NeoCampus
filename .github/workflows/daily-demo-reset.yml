@@ -1,26 +1,30 @@
 name: Daily Demo Database Reset
 on:
   schedule:
-    # Runs at 00:00 UTC (05:30 IST) every day
+    # 18:30 UTC = 00:00 IST (Night 12:00 AM Midnight in India)
+    - cron: '30 18 * * *'
+    # Optional 00:00 UTC fallback (12:00 AM Midnight UTC)
     - cron: '0 0 * * *'
-  workflow_dispatch: # Allows manual trigger from GitHub UI
+  workflow_dispatch: # Allows manual trigger from GitHub UI anytime
 
 jobs:
   reset-demo-database:
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger Demo Reset via API (if LIVE_API_URL provided)
+      - name: Trigger Demo Reset via Live API Endpoint
         if: env.LIVE_API_URL != ''
         env:
           LIVE_API_URL: ${{ secrets.LIVE_API_URL }}
           DEMO_RESET_SECRET: ${{ secrets.DEMO_RESET_SECRET }}
         run: |
           echo "Pinging live deployment demo-reset endpoint..."
-          curl -f -X POST "${LIVE_API_URL}/api/auth/demo-reset/" \
+          curl -f -sS -X POST "${LIVE_API_URL}/api/auth/demo-reset/?source=github_actions_cron" \
             -H "Content-Type: application/json" \
-            -H "X-Demo-Reset-Secret: ${DEMO_RESET_SECRET}" || echo "API ping completed"
+            -H "X-Demo-Reset-Secret: ${DEMO_RESET_SECRET}" || \
+          curl -f -sS -X GET "${LIVE_API_URL}/api/auth/demo-reset/?source=github_actions_cron&secret=${DEMO_RESET_SECRET}" || \
+          echo "Notice: Live API ping attempt completed."
 
-      - name: Checkout Code
+      - name: Checkout Code (Direct Database Reset Fallback)
         if: env.DATABASE_URL != ''
         uses: actions/checkout@v4
 
@@ -30,12 +34,14 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Run Django seed_demo_data command
+      - name: Run Django reset_demo_data command directly
         if: env.DATABASE_URL != ''
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           SECRET_KEY: ${{ secrets.SECRET_KEY || 'django-insecure-github-action-run-key' }}
+          DEMO_MODE: 'True'
+          RESET_TIMEZONE: 'Asia/Kolkata'
         run: |
           cd backend
-          pip install -r requirements.txt
-          python manage.py seed_demo_data --source=github_actions_cron
+          pip install --no-cache-dir "Django>=5.0,<7.0" dj-database-url psycopg2-binary python-decouple openpyxl
+          python manage.py reset_demo_data --source=github_actions_cron

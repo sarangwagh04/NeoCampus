@@ -2,14 +2,14 @@ from google import genai
 from django.conf import settings
 import os
 
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 
-if not GEMINI_API_KEY:
-    raise RuntimeError(
-        "API Failed, Contact Admin"
-    )
-
-client = genai.Client(api_key=GEMINI_API_KEY)
+def get_gemini_client():
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        raise RuntimeError(
+            "GEMINI_API_KEY not configured. Please set the GEMINI_API_KEY environment variable in Render."
+        )
+    return genai.Client(api_key=api_key)
 
 
 def generate_answer(question: str, chunks: list[str], mode: str = "academic") -> str:
@@ -70,6 +70,7 @@ Question:
 Answer:
 """
 
+    client = get_gemini_client()
     response = client.models.generate_content(
         model="gemini-2.5-flash",
         contents=prompt,
