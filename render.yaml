@@ -19,7 +19,7 @@ services:
       - key: DEBUG
         value: "False"
       - key: ALLOWED_HOSTS
-        value: "neocampus-backend.onrender.com,.onrender.com,localhost,127.0.0.1,*"
+        value: "neocampus-backend.onrender.com,localhost,127.0.0.1,*"
       - key: CORS_ALLOW_ALL_ORIGINS
         value: "True"
       - key: DEMO_MODE
@@ -45,7 +45,7 @@ services:
   # 2. REACT FRONTEND STATIC SITE
   # -------------------------------------------------------------
   - type: web
-    name: neocampus
+    name: neocampus-erp
     runtime: static
     rootDir: frontend
     buildCommand: "npm install && npm run build"
