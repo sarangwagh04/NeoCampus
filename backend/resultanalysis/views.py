@@ -56,6 +56,14 @@ class ResultAnalysisAPIView(GenericAPIView):
                 status=status.HTTP_200_OK
             )
 
+        except Exception as e:
+            return Response(
+                {
+                    "error": f"Result analysis error: {str(e)}. Processing large university gazette PDFs (50+ pages) requires significant memory. On Render free tier (512MB RAM), heavy processing may be restricted. Run NeoCampus locally on your system for full, unrestricted gazette analysis."
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
         finally:
             if os.path.exists(tmp_path):
                 os.remove(tmp_path)
@@ -103,7 +111,12 @@ def ai_tryout_analysis(request):
         return response
 
     except Exception as e:
-        return Response({"error": str(e)}, status=500)
+        return Response(
+            {
+                "error": f"AI Tryout error: {str(e)}. Rendering high-resolution PDF pages requires significant memory. On Render free tier (512MB RAM), heavy processing may be restricted. Run NeoCampus locally on your system for full gazette analysis."
+            }, 
+            status=500
+        )
     
 
 
@@ -149,6 +162,8 @@ def ai_extract_analysis(request):
     except Exception as e:
 
         return Response(
-            {"error": str(e)},
+            {
+                "error": f"AI Extraction error: {str(e)}. Processing multi-page university gazette PDFs with AI Vision requires dedicated CPU/RAM. On free cloud instances (512MB RAM), large files are restricted. Run NeoCampus locally on your system for full gazette analysis."
+            },
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )

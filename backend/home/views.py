@@ -115,7 +115,9 @@ class HardwareSignatureLoginView(APIView):
         #     return Response({"error": "Hardware authentication failed"}, status=status.HTTP_401_UNAUTHORIZED)
 
         return Response(
-            {"error": "Hardware verification is currently disabled."}, 
+            {
+                "error": "Hardware verification requires running NeoCampus locally on your machine with a physical USB key and background listener (python manage.py usb_listener). This feature is disabled on cloud deployments due to hardware and resource limitations."
+            }, 
             status=status.HTTP_503_SERVICE_UNAVAILABLE
         )
 
@@ -153,7 +155,12 @@ class GetDrivesView(APIView):
             drive = f"{letter}:/"
             if os.path.exists(drive) and letter not in ['C']:
                 drives.append(drive)
-        return Response({"drives": drives})
+        is_cloud = bool(os.environ.get("RENDER")) or not drives
+        return Response({
+            "drives": drives,
+            "is_cloud": is_cloud,
+            "message": "Physical USB key registration requires running NeoCampus locally with physical access to your system's USB ports." if not drives else "Local drives detected."
+        })
 
 class ChangePasswordView(APIView):
     permission_classes = [IsAuthenticated]

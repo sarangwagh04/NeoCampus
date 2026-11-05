@@ -19,6 +19,15 @@ useEffect(() => {
   const existingToken = localStorage.getItem("access_token");
   if (existingToken) return; // already logged in
 
+  // Hardware USB login requires local listener daemon (python manage.py usb_listener)
+  // Disable polling on cloud production environments to conserve resources
+  const isLocalhost = typeof window !== "undefined" && (
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1" ||
+    window.location.hostname.endsWith(".local")
+  );
+  if (!isLocalhost) return;
+
     const initAuthCheck = async () => {
       try {
         // 1. Wake up the listener because we are on the landing page

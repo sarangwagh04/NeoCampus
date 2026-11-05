@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Upload, FileText, X, ArrowLeft, Loader2 } from "lucide-react";
+import { Upload, FileText, X, ArrowLeft, Loader2, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { AnalysisMetadata } from "@/hooks/useResultAnalysis";
 
@@ -192,7 +192,10 @@ export function AnalysisUploadForm({
             )}
 
             {error && (
-              <p className="text-sm text-destructive">{error}</p>
+              <div className="p-3.5 rounded-lg border border-destructive/30 bg-destructive/10 text-destructive text-sm flex items-start gap-2.5 text-left">
+                <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                <span className="leading-relaxed">{error}</span>
+              </div>
             )}
           </div>
 

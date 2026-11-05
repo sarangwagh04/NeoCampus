@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Upload, Brain, Sparkles, FileText, X, Columns3 } from "lucide-react";
+import { ArrowLeft, Upload, Brain, Sparkles, FileText, X, Columns3, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SparkleParticles } from "@/components/ui/sparkle-particles";
 
@@ -287,7 +287,10 @@ export function AIUploadForm({ onFileUpload, onBack, error }: AIUploadFormProps)
 
 
           {error && (
-            <p className="text-sm text-destructive text-center animate-fade-in">{error}</p>
+            <div className="p-3.5 rounded-lg border border-destructive/30 bg-destructive/10 text-destructive text-sm flex items-start gap-2.5 animate-fade-in text-left">
+              <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+              <span className="leading-relaxed">{error}</span>
+            </div>
           )}
         </CardContent>
       </Card>

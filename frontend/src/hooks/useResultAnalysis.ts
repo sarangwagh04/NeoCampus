@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { API_BASE_URL } from "@/api/axios";
 
 export type AnalysisMethod = "traditional" | "ai" | null;
 
@@ -122,13 +123,14 @@ export function useResultAnalysis() {
       const formData = new FormData();
       formData.append("file", uploadedFile);
 
-      const res = await fetch("/api/result-analysis/analyze/", {
+      const res = await fetch(`${API_BASE_URL}/result-analysis/analyze/`, {
         method: "POST",
         body: formData,
       });
 
       if (!res.ok) {
-        throw new Error("Failed to analyze PDF");
+        const errJson = await res.json().catch(() => null);
+        throw new Error(errJson?.error || "Failed to analyze PDF");
       }
 
       const data = await res.json();
@@ -167,8 +169,12 @@ export function useResultAnalysis() {
       };
 
       setReport(finalReport);
-    } catch (err) {
-      setError("Failed to process the PDF. Please try again.");
+    } catch (err: any) {
+      setError(
+        err.message?.includes("resource") || err.message?.includes("cloud")
+          ? err.message
+          : "Cloud Resource Notice: Full university gazette analysis requires high compute/memory (Render free tier limit: 512MB RAM). For multi-page gazette processing, run NeoCampus locally on your machine."
+      );
     } finally {
       setIsProcessing(false);
     }

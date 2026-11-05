@@ -3,9 +3,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { FileText, Sparkles, Check, Lock, Zap, Brain, TrendingUp, BarChart3, FlaskConical, Loader2 } from "lucide-react";
+import { FileText, Sparkles, Check, Lock, Zap, Brain, TrendingUp, BarChart3, FlaskConical, Loader2, AlertTriangle, Monitor } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SparkleParticles } from "@/components/ui/sparkle-particles";
+import { API_BASE_URL } from "@/api/axios";
 import type { AnalysisMethod } from "@/hooks/useResultAnalysis";
 
 interface AnalysisMethodSelectorProps {
@@ -40,61 +41,71 @@ export function AnalysisMethodSelector({ onSelect }: AnalysisMethodSelectorProps
 
       formData.append("file", file);
 
-      const response = await fetch("/api/result-analysis/ai-tryout/", {
+      const response = await fetch(`${API_BASE_URL}/result-analysis/ai-tryout/`, {
         method: "POST",
         body: formData,
       });
 
       if (!response.ok) {
-        throw new Error("Failed to process PDF");
+        const errJson = await response.json().catch(() => null);
+        throw new Error(errJson?.error || "Failed to process PDF");
       }
 
       // ================================
       // 🔁 EXISTING LOGIC PRESERVED
       // Handle Excel file returned from backend
       // ================================
-
       const blob = await response.blob();
-
       const url = window.URL.createObjectURL(blob);
-
       const a = document.createElement("a");
-
       a.href = url;
-
       a.download = "AI_Result_Analysis.xlsx";
-
       document.body.appendChild(a);
-
       a.click();
-
       a.remove();
-
       window.URL.revokeObjectURL(url);
 
-    } catch (error) {
-
+    } catch (error: any) {
       console.error("AI Tryout Error:", error);
-
-      alert("Failed to process PDF. Please try again.");
+      alert(
+        "Notice: Processing large result gazettes requires high memory and compute. On our free cloud deployment (512MB RAM), full gazette analysis may exceed resource limits.\n\n" +
+        "To experience full, unrestricted result analysis with multi-page PDFs, please run NeoCampus locally on your machine."
+      );
 
     } finally {
-
       setIsTryoutProcessing(false);
-
       if (tryoutFileRef.current) tryoutFileRef.current.value = "";
-
     }
-
   };
 
-
   return (
-
     <div className="space-y-6">
+      {/* Cloud Environment Resource Limit Alert Banner */}
+      <div className="p-4 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-900 dark:text-amber-200 text-sm max-w-4xl mx-auto shadow-sm">
+        <div className="flex items-start gap-3">
+          <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+          <div className="space-y-1.5">
+            <h4 className="font-semibold text-amber-600 dark:text-amber-400">
+              Cloud Environment Resource Limitation
+            </h4>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Multi-page University Gazette Analysis (PDF table parsing, image rasterization, and AI OCR extraction) requires heavy CPU and RAM. 
+              On our free cloud deployment (limited to 512MB RAM and short timeouts), processing large gazettes (50+ pages) may be restricted or time out.
+            </p>
+            <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
+              <span className="font-medium text-foreground">
+                To experience full, high-speed result analysis:
+              </span>
+              <span className="inline-flex items-center gap-1 font-mono text-[11px] bg-background/80 px-2 py-0.5 rounded border border-border">
+                <Monitor className="w-3 h-3 text-primary" />
+                Run project locally on your system
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div className="text-center space-y-2">
-
         <h2 className="text-xl font-semibold text-foreground">
           Choose Analysis Method
         </h2>

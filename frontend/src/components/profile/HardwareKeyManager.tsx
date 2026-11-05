@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Usb, Key, Loader2, CheckCircle2 } from "lucide-react";
+import { Usb, Key, Loader2, CheckCircle2, AlertTriangle, Monitor, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -18,10 +18,15 @@ export function HardwareKeyManager() {
   const [registering, setRegistering] = useState(false);
   const [drives, setDrives] = useState<string[]>([]);
 
+  const isLocalhost = typeof window !== "undefined" && (
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1" ||
+    window.location.hostname.endsWith(".local")
+  );
+
   const fetchDrives = async () => {
     setLoading(true);
     try {
-      // Assuming 'api' is configured with base URL
       const response = await api.get("/auth/hardware-drives/");
       setDrives(response.data.drives || []);
     } catch (error) {
@@ -33,6 +38,10 @@ export function HardwareKeyManager() {
   };
 
   const registerKey = async (drive: string) => {
+    if (!isLocalhost) {
+      toast.info("Hardware key registration requires running NeoCampus locally on your computer.");
+      return;
+    }
     setRegistering(true);
     try {
       await api.post("/auth/hardware-register/", { drive });
@@ -67,23 +76,44 @@ export function HardwareKeyManager() {
           Register Security Key
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[460px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Usb className="w-5 h-5" />
+            <Usb className="w-5 h-5 text-primary" />
             Hardware Security Key
           </DialogTitle>
           <DialogDescription>
-            Select a removable drive to securely store your digital signature key. 
-            This will allow you to log in automatically when the key is plugged in.
+            Authenticate seamlessly using a physical USB key with Ed25519 digital signatures.
           </DialogDescription>
         </DialogHeader>
+
+        {/* Cloud Environment Notice Banner */}
+        {!isLocalhost && (
+          <div className="p-3.5 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-900 dark:text-amber-200 text-xs space-y-2">
+            <div className="flex items-start gap-2">
+              <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-amber-600 dark:text-amber-400">
+                  Local System Feature
+                </p>
+                <p className="mt-1 text-muted-foreground leading-relaxed">
+                  To experience physical USB hardware authentication, run this project locally on your machine. 
+                  Due to browser sandbox security and cloud isolation, remote cloud servers cannot access client USB ports directly.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-1.5 pt-1 text-[11px] font-mono text-muted-foreground">
+              <Monitor className="w-3.5 h-3.5" />
+              <span>Run locally: python manage.py usb_listener</span>
+            </div>
+          </div>
+        )}
         
-        <div className="py-4">
+        <div className="py-2">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-6 gap-2 text-muted-foreground">
-              <Loader2 className="w-6 h-6 animate-spin" />
-              <span className="text-sm">Scanning for devices...</span>
+              <Loader2 className="w-6 h-6 animate-spin text-primary" />
+              <span className="text-sm">Scanning for local devices...</span>
             </div>
           ) : drives.length > 0 ? (
             <div className="space-y-3">
@@ -105,11 +135,15 @@ export function HardwareKeyManager() {
               </div>
             </div>
           ) : (
-            <div className="text-center py-6 px-4 bg-muted/50 rounded-lg border border-dashed">
+            <div className="text-center py-6 px-4 bg-muted/40 rounded-lg border border-dashed">
               <Usb className="w-8 h-8 text-muted-foreground/50 mx-auto mb-2" />
-              <p className="text-sm text-foreground font-medium">No removable drives found</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                Please insert a USB drive and try again.
+              <p className="text-sm text-foreground font-medium">
+                {isLocalhost ? "No removable drives found" : "No cloud USB hardware attached"}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1.5 max-w-xs mx-auto">
+                {isLocalhost
+                  ? "Please insert a USB flash drive into your machine and try again."
+                  : "Physical USB keys only function on local system installations where the USB listener is active."}
               </p>
             </div>
           )}

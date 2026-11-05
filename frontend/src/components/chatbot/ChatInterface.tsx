@@ -197,7 +197,7 @@ export function ChatInterface({ variant = "dashboard" }: ChatInterfaceProps) {
         const assistantMessage: Message = {
           id: (Date.now() + 1).toString(),
           role: "assistant",
-          content: "This feature is disabled in production due to limited resources...\nPlease use your 'Other' mode chatbot for assistance. or setup locally",
+          content: `⚡ **Cloud Resource Limitation Notice**\n\nDomain-specific document retrieval (RAG) for **${selectedSubject.name}** uses local PyTorch neural networks and \`sentence-transformers\` vector embeddings.\n\nBecause our free cloud deployment operates within a 512MB RAM ceiling, local neural vector search is restricted in production to maintain server stability.\n\n💡 **How to explore:**\n• **Live Cloud AI:** Switch to the **'Other'** subject mode to chat directly with our AI assistant.\n• **Full RAG Experience:** Clone and run NeoCampus locally on your system (\`python manage.py runserver\`) where your system has full RAM and compute available.`,
           timestamp: new Date(),
         };
 
@@ -247,7 +247,7 @@ export function ChatInterface({ variant = "dashboard" }: ChatInterfaceProps) {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: "⚠️ Something went wrong. Please try again.",
+        content: "⚠️ The AI service encountered a temporary error or rate limit. If running on our free cloud tier, this may be due to resource constraints. Try switching to 'Other' mode or running NeoCampus locally.",
         timestamp: new Date(),
       };
 
@@ -285,6 +285,23 @@ export function ChatInterface({ variant = "dashboard" }: ChatInterfaceProps) {
         subjects={subjects}
         onSelectSubject={handleSubjectChange}
       />
+
+      {/* RAG Mode Cloud Limitation Alert Banner */}
+      {selectedSubject && (selectedSubject.id === "dbms" || selectedSubject.id === "updates") && (
+        <div className="flex-shrink-0 px-4 py-2 bg-amber-500/10 border-b border-amber-500/20 text-xs flex flex-wrap items-center justify-between gap-2 text-amber-900 dark:text-amber-200">
+          <div className="flex items-center gap-1.5">
+            <span className="font-semibold text-amber-600 dark:text-amber-400">⚡ Resource Limit Notice:</span>
+            <span>Neural RAG vector retrieval (PyTorch / SentenceTransformers) is limited on free cloud tier (512MB RAM). Run locally for full RAG vector search.</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => handleSubjectChange(baseSubjects[0])}
+            className="text-[11px] font-medium underline text-amber-600 dark:text-amber-400 hover:opacity-80 ml-auto"
+          >
+            Switch to Other (Live AI)
+          </button>
+        </div>
+      )}
 
       <div className="flex-1 min-h-0 overflow-y-auto">
         {messages.length === 0 ? (

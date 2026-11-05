@@ -1,3 +1,5 @@
+import { API_BASE_URL } from "@/api/axios";
+
 export interface ChatbotResponse {
   answer: string;
   sources?: {
@@ -11,7 +13,7 @@ export async function askChatbot(
   question: string,
   context: string | null
 ): Promise<ChatbotResponse> {
-  const response = await fetch("/api/chatbot/ask/", {
+  const response = await fetch(`${API_BASE_URL}/chatbot/ask/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

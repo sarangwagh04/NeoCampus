@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { API_BASE_URL } from "@/api/axios";
 import type { AnalysisReport, SubjectResult, ClassSummary, Topper } from "./useResultAnalysis";
 import type { AIMetadata } from "@/components/staff/analysis/AIUploadForm";
 export type AIStep =
@@ -320,14 +321,20 @@ export function useAIResultAnalysis() {
         formData.append("column_names", columns);
       }
 
-      const response = await fetch("/api/result-analysis/ai-extract/", {
+      const response = await fetch(`${API_BASE_URL}/result-analysis/ai-extract/`, {
         method: "POST",
         body: formData,
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || "Failed to process file");
+        let errorMsg = "Failed to process file";
+        try {
+          const errData = await response.json();
+          errorMsg = errData.error || errorMsg;
+        } catch {
+          errorMsg = await response.text();
+        }
+        throw new Error(errorMsg);
       }
 
       const data = await response.json();
@@ -355,13 +362,13 @@ export function useAIResultAnalysis() {
       setStep("column-select");
 
     } catch (err: any) {
-
       console.error("AI upload error:", err);
-
+      const isCloudLimit = err?.message?.includes("resource") || err?.message?.includes("GEMINI") || err?.message?.includes("500") || err?.message?.includes("504");
       setError(
-        err?.message || "Failed to process the file. Please try again."
+        isCloudLimit
+          ? "Cloud Resource Limit: Processing large gazette PDFs with AI Vision requires dedicated CPU/RAM (512MB limit on free cloud tier). To experience full gazette analysis, run NeoCampus locally on your machine."
+          : err?.message || "Failed to process the file. Please try again."
       );
-
       setStep("upload");
     }
 
