@@ -7,7 +7,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { GraduationCap, Eye, EyeOff, Loader2, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AuroraBackground } from "@/components/landing/aurora-background";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { motion } from "framer-motion";
 import api from "@/api/axios";
 
@@ -100,10 +99,6 @@ const Login = () => {
           <ArrowLeft className="h-5 w-5 text-primary" />
           <span className="sr-only">Go back</span>
         </Button>
-      </div>
-
-      <div className="fixed top-4 right-4 z-50">
-        <ThemeToggle />
       </div>
 
       <motion.div
@@ -246,13 +241,6 @@ const Login = () => {
                     className="px-3 py-1.5 text-xs font-medium rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 border border-amber-500/20 transition-all"
                   >
                     HOD
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { setUsername("admin"); setPassword("admin123"); }}
-                    className="px-3 py-1.5 text-xs font-medium rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 hover:bg-purple-500/20 border border-purple-500/20 transition-all"
-                  >
-                    Admin
                   </button>
                   <p className="w-full text-center text-[11px] text-muted-foreground/80 mt-2">
                     ✨ Demo Mode: Test freely. Database resets daily with fresh baseline data.

@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { GraduationCap, LogIn, MessageSquare, ArrowUp, Sun, Moon, Droplets } from "lucide-react";
+import { GraduationCap, LogIn, MessageSquare, ArrowUp, Droplets } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
 
 
@@ -13,7 +12,6 @@ interface FloatingNavProps {
 
 export const FloatingNav = ({ splashCursorEnabled, onToggleSplashCursor }: FloatingNavProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -30,10 +28,6 @@ export const FloatingNav = ({ splashCursorEnabled, onToggleSplashCursor }: Float
       top: 0,
       behavior: "smooth"
     });
-  };
-
-  const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
   };
 
   return (
@@ -90,41 +84,20 @@ export const FloatingNav = ({ splashCursorEnabled, onToggleSplashCursor }: Float
           )}
         </AnimatePresence>
 
-        {/* Combined Toggle Capsule */}
-        <div className="flex items-center bg-background/80 backdrop-blur-md border border-border/50 rounded-full shadow-lg h-10 px-1">
-          {/* Splash Effect Toggle */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onToggleSplashCursor}
-            className={`rounded-full h-8 w-8 p-0 transition-colors ${
-              splashCursorEnabled 
-                ? "text-primary bg-primary/10" 
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-            title={splashCursorEnabled ? "Disable splash effect" : "Enable splash effect"}
-          >
-            <Droplets className="h-4 w-4" />
-          </Button>
-
-          {/* Divider */}
-          <div className="w-px h-5 bg-border/50 mx-0.5" />
-
-          {/* Theme Toggle */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={toggleTheme}
-            className="rounded-full h-8 w-8 p-0 text-muted-foreground hover:text-foreground transition-colors"
-            title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-          >
-            {theme === "dark" ? (
-              <Sun className="h-4 w-4" />
-            ) : (
-              <Moon className="h-4 w-4" />
-            )}
-          </Button>
-        </div>
+        {/* Splash Effect Toggle */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onToggleSplashCursor}
+          className={`rounded-full h-10 w-10 p-0 bg-background/80 backdrop-blur-md border border-border/50 shadow-lg transition-colors ${
+            splashCursorEnabled 
+              ? "text-primary bg-primary/10" 
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+          title={splashCursorEnabled ? "Disable splash effect" : "Enable splash effect"}
+        >
+          <Droplets className="h-4 w-4" />
+        </Button>
 
         {/* Login Button */}
         <Button
