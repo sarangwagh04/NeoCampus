@@ -9,6 +9,26 @@ export default defineConfig({
       "@": path.resolve(__dirname, "src"),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes("node_modules")) {
+            if (
+              id.includes("html2canvas") ||
+              id.includes("dompurify") ||
+              id.includes("xlsx") ||
+              id.includes("jspdf") ||
+              id.includes("canvas-confetti")
+            ) {
+              return "vendor-docs";
+            }
+          }
+        },
+      },
+    },
+    chunkSizeWarningLimit: 1000,
+  },
   server: {
     proxy: {
       "/api": {

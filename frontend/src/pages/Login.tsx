@@ -6,7 +6,6 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { GraduationCap, Eye, EyeOff, Loader2, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import SplashCursor from "@/components/landing/SplashCursor";
 import { AuroraBackground } from "@/components/landing/aurora-background";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { motion } from "framer-motion";
@@ -25,11 +24,21 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
 
+    // Alert user if free cloud tier is experiencing a cold start
+    const coldStartTimer = setTimeout(() => {
+      toast({
+        title: "Connecting to Cloud Server...",
+        description: "Render Free instances spin down when idle. Cold start wake-up can take ~30-45s.",
+      });
+    }, 3500);
+
     try {
       const response = await api.post("/auth/login/", {
         username,
         password,
       });
+
+      clearTimeout(coldStartTimer);
 
       // ✅ Save tokens
       localStorage.setItem("access_token", response.data.access);
@@ -66,19 +75,20 @@ const Login = () => {
       }
 
     } catch (error) {
+      clearTimeout(coldStartTimer);
       toast({
         title: "Login Failed",
         description: "Invalid credentials",
         variant: "destructive",
       });
     } finally {
+      clearTimeout(coldStartTimer);
       setIsLoading(false);
     }
   };
 
   return (
     <AuroraBackground className="!h-screen">
-      <SplashCursor />
       {/* Navigation and Actions */}
       <div className="fixed top-4 left-4 z-50">
         <Button

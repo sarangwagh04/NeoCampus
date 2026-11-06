@@ -13,7 +13,8 @@ import { AuroraBackground } from "@/components/landing/aurora-background";
 import { API_BASE_URL } from "@/api/axios";
 
 const Landing = () => {
-  const [splashCursorEnabled, setSplashCursorEnabled] = useState(true);
+  // Default disabled for maximum 60fps performance; user can toggle via FloatingNav
+  const [splashCursorEnabled, setSplashCursorEnabled] = useState(false);
 
 useEffect(() => {
   const existingToken = localStorage.getItem("access_token");

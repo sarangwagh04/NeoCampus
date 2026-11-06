@@ -36,7 +36,15 @@ import StaffProfile from "./pages/staff/StaffProfile";
 
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60 * 1000, // 1 minute in-memory cache
+      refetchOnWindowFocus: false, // Prevent redundant background fetches
+      retry: 1,
+    },
+  },
+});
 
 const App = () => (
   <ThemeProvider attribute="class" defaultTheme="system" enableSystem>

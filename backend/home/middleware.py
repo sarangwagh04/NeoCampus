@@ -49,11 +49,17 @@ class DemoAutoResetMiddleware:
             last_reset_time = last_reset.reset_at if last_reset else None
 
             if should_reset_for_midnight(last_reset_time, reset_tz_name=tz_name, reset_hour=reset_hour, reset_minute=reset_minute):
+                import threading
                 logger.info(
                     f"Midnight reset boundary passed ({reset_hour:02d}:{reset_minute:02d} in {tz_name}). "
-                    f"Deleting user-created demo data and reseeding clean baseline..."
+                    f"Spawning background thread to delete user-created demo data and reseed clean baseline..."
                 )
-                reset_and_seed_demo_data(triggered_by="daily_midnight_auto_middleware")
+                reset_thread = threading.Thread(
+                    target=reset_and_seed_demo_data,
+                    args=("daily_midnight_auto_middleware",),
+                    daemon=True,
+                )
+                reset_thread.start()
         except Exception as e:
             # Never let auto-reset error crash normal user requests
             logger.error(f"Error in DemoAutoResetMiddleware: {e}", exc_info=True)
